@@ -9,3 +9,7 @@ tests/*
 
 # Ignore zip files in workflows folder
 workflows/**/*.zip
+
+# AI IDE configuration directories
+.claude/
+.cursor/
