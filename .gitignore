@@ -11,5 +11,10 @@ tests/*
 workflows/**/*.zip
 
 # AI IDE configuration directories
-.claude/
-.cursor/
+.claude/*
+.cursor/*
+AGENTS.md
+CLAUDE.md
+CHANGELOG.md
+.history/
+./claude/hooks/*
