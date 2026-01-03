@@ -138,6 +138,15 @@ else
     git pull
 fi
 
+if [ ! -d "$NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-Wan22FMLF" ]; then
+    cd $NETWORK_VOLUME/ComfyUI/custom_nodes
+    git clone https://github.com/wallen0322/ComfyUI-Wan22FMLF.git
+else
+    echo "Updating Wan22FMLF"
+    cd $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-Wan22FMLF
+    git pull
+fi
+
 
 echo "🔧 Installing KJNodes packages..."
 pip install --no-cache-dir -r $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-KJNodes/requirements.txt &
@@ -310,6 +319,8 @@ download_model "https://huggingface.co/lightx2v/Wan2.2-Lightning/resolve/main/Wa
 download_model "https://huggingface.co/lightx2v/Wan2.2-Lightning/resolve/main/Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V1.1/low_noise_model.safetensors" "$LORAS_DIR/t2v_lightx2v_low_noise_model.safetensors"
 download_model "https://huggingface.co/lightx2v/Wan2.2-Distill-Loras/resolve/main/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_1022.safetensors" "$LORAS_DIR/i2v_lightx2v_high_noise_model.safetensors"
 download_model "https://huggingface.co/lightx2v/Wan2.2-Distill-Loras/resolve/main/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors" "$LORAS_DIR/i2v_lightx2v_low_noise_model.safetensors"
+download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors"
+download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors"
 
 # Download text encoders
 echo "Downloading text encoders..."
