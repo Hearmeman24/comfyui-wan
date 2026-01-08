@@ -86,10 +86,13 @@ fi
 if [ ! -d "$NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-KJNodes" ]; then
     cd $NETWORK_VOLUME/ComfyUI/custom_nodes
     git clone https://github.com/kijai/ComfyUI-KJNodes.git
+    cd $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-KJNodes
+    git reset --hard 204f6d5
 else
     echo "Updating KJ Nodes"
     cd $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-KJNodes
     git pull
+    git reset --hard 204f6d5
 fi
 
 if [ ! -d "$NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-VibeVoice" ]; then
