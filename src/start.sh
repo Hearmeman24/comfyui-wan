@@ -574,7 +574,7 @@ nohup python3 "$NETWORK_VOLUME/ComfyUI/main.py" --listen --use-sage-attention > 
 
     # Counter for timeout
     counter=0
-    max_wait=45
+    max_wait=70
 
     until curl --silent --fail "$URL" --output /dev/null; do
         if [ $counter -ge $max_wait ]; then
