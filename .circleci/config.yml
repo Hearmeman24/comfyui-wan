@@ -11,6 +11,26 @@ executors:
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1
 
+commands:
+  notify-flowbot:
+    description: Send a webhook notification to FlowBot
+    parameters:
+      message:
+        type: string
+    steps:
+      - run:
+          name: Notify FlowBot
+          when: always
+          command: |
+            if [ -z "$FLOWBOT_WEBHOOK_URL" ] || [ -z "$FLOWBOT_WEBHOOK_TOKEN" ]; then
+              echo "Missing webhook env vars, skipping notification."
+              exit 0
+            fi
+            curl -s -X POST "${FLOWBOT_WEBHOOK_URL}/hooks/agent" \
+              -H "Authorization: Bearer ${FLOWBOT_WEBHOOK_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"message\": \"<< parameters.message >>\", \"source\": \"circleci\"}"
+
 jobs:
   build_and_push:
     executor: docker-dind
@@ -21,6 +41,9 @@ jobs:
           name: Log in to Docker Hub
           command: |
             echo "$DOCKERHUB_PAT" | docker login -u "$DOCKERHUB_USER" --password-stdin
+
+      - notify-flowbot:
+          message: "A Docker build for comfyui-wan-template has started."
 
       - run:
           name: Build & push without cache
@@ -34,12 +57,35 @@ jobs:
 
             docker push "${IMG}:${TAG}"
 
+            touch /tmp/build_success
+
+      - run:
+          name: Notify FlowBot — build complete
+          when: always
+          command: |
+            TAG="${CIRCLE_TAG:-latest}"
+            if [ -z "$FLOWBOT_WEBHOOK_URL" ] || [ -z "$FLOWBOT_WEBHOOK_TOKEN" ]; then
+              echo "Missing webhook env vars, skipping notification."
+              exit 0
+            fi
+            if [ -f /tmp/build_success ]; then
+              MSG="Docker build for comfyui-wan-template:${TAG} completed and pushed to Docker Hub."
+            else
+              MSG="Docker build for comfyui-wan-template:${TAG} failed."
+            fi
+            curl -s -X POST "${FLOWBOT_WEBHOOK_URL}/hooks/agent" \
+              -H "Authorization: Bearer ${FLOWBOT_WEBHOOK_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"message\": \"${MSG}\", \"source\": \"circleci\"}"
+
 workflows:
   version: 2
   build_on_tag:
     jobs:
       - build_and_push:
-          context: docker-hub
+          context:
+            - docker-hub
+            - flowbot-webhook-token
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*$/   # run on tags like v5 or v1.2.3
