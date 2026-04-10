@@ -570,7 +570,7 @@ pip install comfy-kitchen
 
 echo "▶️  Starting ComfyUI"
 
-nohup python3 "$NETWORK_VOLUME/ComfyUI/main.py" --listen --use-sage-attention > "$NETWORK_VOLUME/comfyui_${RUNPOD_POD_ID}_nohup.log" 2>&1 &
+nohup python3 "$NETWORK_VOLUME/ComfyUI/main.py" --listen --enable-cors-header '*' --use-sage-attention > "$NETWORK_VOLUME/comfyui_${RUNPOD_POD_ID}_nohup.log" 2>&1 &
 
     # Counter for timeout
     counter=0
