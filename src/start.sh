@@ -61,7 +61,7 @@ mkdir -p "$PERSIST_ROOT/models" "$PERSIST_ROOT/user" \
 # volume — PERSIST_ROOT would equal COMFYUI_DIR and ComfyUI's defaults
 # already cover those paths.
 EXTRA_PATHS_FLAG=""
-if [ "$PERSIST_ROOT" != "$COMFYUI_DIR" ]; then
+if [ "$NETWORK_VOLUME" != "/" ]; then
     cat > "$COMFYUI_DIR/extra_model_paths.yaml" <<EOF
 network_volume:
     base_path: $PERSIST_ROOT
