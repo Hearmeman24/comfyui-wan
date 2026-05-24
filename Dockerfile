@@ -37,7 +37,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Runtime libraries
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install pyyaml gdown triton comfy-cli jupyterlab jupyterlab-lsp \
+    pip install pyyaml gdown triton jupyterlab jupyterlab-lsp \
         jupyter-server jupyter-server-terminals \
         ipykernel jupyterlab_code_formatter
 
@@ -46,11 +46,12 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade huggingface_hub
 
 # ------------------------------------------------------------
-# ComfyUI install
+# ComfyUI install — direct clone + pip install. Replaces comfy-cli,
+# which used to clone the same repo and create a private .venv we then
+# deleted anyway. Simpler, fewer indirection layers, no ~7 GB .venv.
 # ------------------------------------------------------------
 RUN --mount=type=cache,target=/root/.cache/pip \
-    /usr/bin/yes | comfy --workspace /ComfyUI install \
-    && rm -rf /ComfyUI/.venv \
+    git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /ComfyUI \
     && pip install -r /ComfyUI/requirements.txt
 
 FROM base AS final
