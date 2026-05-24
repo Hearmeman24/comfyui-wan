@@ -1,0 +1,50 @@
+name: static-checks
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: bash syntax (bash -n)
+        run: bash -n src/start.sh src/start_script.sh
+
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y shellcheck
+          shellcheck --severity=error src/start.sh src/start_script.sh
+
+      - name: python syntax (py_compile)
+        run: |
+          python -m py_compile \
+            src/hf_download_manager.py \
+            src/workflow_provisioner.py \
+            tools/validate_models.py
+
+      - name: workflow JSON validity
+        run: |
+          python - <<'EOF'
+          import json, pathlib, sys
+          bad = []
+          for p in pathlib.Path('workflows').rglob('*.json'):
+              try:
+                  json.loads(p.read_text())
+              except Exception as e:
+                  bad.append(f"{p}: {e}")
+          if bad:
+              for b in bad:
+                  print(b)
+              sys.exit(1)
+          print(f"ok: {sum(1 for _ in pathlib.Path('workflows').rglob('*.json'))} workflows parse")
+          EOF
+
+      - name: models_registry.json validity
+        run: python -c "import json; json.load(open('src/models_registry.json'))"

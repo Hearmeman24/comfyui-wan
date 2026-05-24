@@ -5,7 +5,8 @@ FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04 AS base
 ENV DEBIAN_FRONTEND=noninteractive \
    PIP_PREFER_BINARY=1 \
    PYTHONUNBUFFERED=1 \
-   CMAKE_BUILD_PARALLEL_LEVEL=8
+   CMAKE_BUILD_PARALLEL_LEVEL=8 \
+   HF_XET_HIGH_PERFORMANCE=1
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && \
@@ -39,6 +40,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install pyyaml gdown triton comfy-cli jupyterlab jupyterlab-lsp \
         jupyter-server jupyter-server-terminals \
         ipykernel jupyterlab_code_formatter
+
+# huggingface_hub (provides `hf` CLI + bundled hf_xet accelerator)
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade huggingface_hub
 
 # ------------------------------------------------------------
 # ComfyUI install
