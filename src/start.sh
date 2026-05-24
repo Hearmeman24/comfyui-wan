@@ -261,6 +261,19 @@ else
     echo "4xLSDIR.pth already exists. Skipping."
 fi
 
+# 2xLiveActionV1_SPAN — direct download (raw GitHub, not on HF, so not
+# part of the model registry/provisioner).
+LIVEACTION_DEST="$NETWORK_VOLUME/ComfyUI/models/upscale_models/2xLiveActionV1_SPAN_490000.pth"
+if [ ! -f "$LIVEACTION_DEST" ]; then
+    echo "Downloading 2xLiveActionV1_SPAN..."
+    aria2c -x 8 -s 8 --console-log-level=warn --summary-interval=0 \
+        -d "$(dirname "$LIVEACTION_DEST")" -o "$(basename "$LIVEACTION_DEST")" \
+        "https://raw.githubusercontent.com/jcj83429/upscaling/f73a3a02874360ec6ced18f8bdd8e43b5d7bba57/2xLiveActionV1_SPAN/2xLiveActionV1_SPAN_490000.pth" \
+        || echo "⚠️  2xLiveActionV1_SPAN download failed (continuing)"
+else
+    echo "2xLiveActionV1_SPAN already exists. Skipping."
+fi
+
 echo "Finished downloading models!"
 
 
