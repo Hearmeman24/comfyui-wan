@@ -105,6 +105,17 @@ RUN for repo in \
         fi; \
     done
 
+# ComfyUI-Manager. Cloned as lowercase `comfyui-manager` so it loads
+# after the other custom_nodes (ComfyUI loads alphabetically — capital
+# letters first), which is required for Manager to detect IMPORT FAILED
+# states in earlier-loaded nodes.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    git clone --depth=1 https://github.com/ltdrdata/ComfyUI-Manager.git \
+        /ComfyUI/custom_nodes/comfyui-manager \
+    && if [ -f /ComfyUI/custom_nodes/comfyui-manager/requirements.txt ]; then \
+         pip install -r /ComfyUI/custom_nodes/comfyui-manager/requirements.txt; \
+       fi
+
 COPY src/start_script.sh /start_script.sh
 RUN chmod +x /start_script.sh
 COPY 4xLSDIR.pth /4xLSDIR.pth
