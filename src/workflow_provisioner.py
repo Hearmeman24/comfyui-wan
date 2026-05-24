@@ -98,10 +98,18 @@ def main() -> int:
         if trigger and trigger in queued:
             queued[b] = entry
 
+    # Skip files that already exist on disk above a sanity threshold.
+    # Matches the pre-refactor bash behavior (10 MB cutoff catches
+    # complete files while still re-fetching obviously-truncated ones).
+    MIN_OK_SIZE = 10 * 1024 * 1024
+    skipped_existing = []
     lines = []
     for b in sorted(queued):
         entry = queued[b]
         dest = models_root / entry["subdir"] / b
+        if dest.is_file() and dest.stat().st_size >= MIN_OK_SIZE:
+            skipped_existing.append(b)
+            continue
         lines.append(f"{entry['url']}\t{dest}")
     manifest.write_text("\n".join(lines) + ("\n" if lines else ""))
 
@@ -116,7 +124,8 @@ def main() -> int:
 
     print(f"[provisioner] flags: {','.join(args.flags)}")
     print(f"[provisioner] workflows copied: {copied}")
-    print(f"[provisioner] models queued: {len(queued)}")
+    print(f"[provisioner] models queued: {len(lines)} "
+          f"({len(skipped_existing)} already on disk, skipped)")
     if user_supplied:
         print(f"[provisioner] {len(user_supplied)} user-supplied LoRA(s) referenced "
               "but not in registry — place them manually or via "
