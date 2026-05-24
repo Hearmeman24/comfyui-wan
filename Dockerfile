@@ -108,6 +108,5 @@ RUN for repo in \
 COPY src/start_script.sh /start_script.sh
 RUN chmod +x /start_script.sh
 COPY 4xLSDIR.pth /4xLSDIR.pth
-COPY src/extra_model_paths.yaml /ComfyUI/extra_model_paths.yaml
 
 CMD ["/start_script.sh"]
