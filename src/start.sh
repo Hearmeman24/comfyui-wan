@@ -55,6 +55,37 @@ mkdir -p "$PERSIST_ROOT/models" "$PERSIST_ROOT/user" \
          "$PERSIST_ROOT/output" "$PERSIST_ROOT/input" \
          "$PERSIST_ROOT/custom_nodes"
 
+# Generate extra_model_paths.yaml from the live $PERSIST_ROOT so paths
+# always match the actual network volume (not a baked-in /workspace
+# assumption). Skip the file + flag when there's no real persistent
+# volume — PERSIST_ROOT would equal COMFYUI_DIR and ComfyUI's defaults
+# already cover those paths.
+EXTRA_PATHS_FLAG=""
+if [ "$PERSIST_ROOT" != "$COMFYUI_DIR" ]; then
+    cat > "$COMFYUI_DIR/extra_model_paths.yaml" <<EOF
+network_volume:
+    base_path: $PERSIST_ROOT
+    checkpoints: models/checkpoints
+    clip: models/clip
+    clip_vision: models/clip_vision
+    controlnet: models/controlnet
+    diffusion_models: models/diffusion_models
+    embeddings: models/embeddings
+    loras: models/loras
+    style_models: models/style_models
+    text_encoders: models/text_encoders
+    unet: models/unet
+    upscale_models: models/upscale_models
+    latent_upscale_models: models/latent_upscale_models
+    detection: models/detection
+    vae: models/vae
+    custom_nodes: custom_nodes
+EOF
+    EXTRA_PATHS_FLAG="--extra-model-paths-config $COMFYUI_DIR/extra_model_paths.yaml"
+else
+    rm -f "$COMFYUI_DIR/extra_model_paths.yaml"
+fi
+
 echo "Downloading CivitAI download script to /usr/local/bin"
 git clone "https://github.com/Hearmeman24/CivitAI_Downloader.git" || { echo "Git clone failed"; exit 1; }
 mv CivitAI_Downloader/download_with_aria.py "/usr/local/bin/" || { echo "Move failed"; exit 1; }
@@ -305,7 +336,7 @@ fi
 echo "▶️  Starting ComfyUI"
 
 nohup python3 "$COMFYUI_DIR/main.py" --listen --enable-cors-header '*' --use-sage-attention \
-    --extra-model-paths-config "$COMFYUI_DIR/extra_model_paths.yaml" \
+    $EXTRA_PATHS_FLAG \
     --user-directory "$PERSIST_ROOT/user" \
     --output-directory "$PERSIST_ROOT/output" \
     --input-directory "$PERSIST_ROOT/input" \
