@@ -3,10 +3,15 @@ version: 2.1
 
 executors:
   docker-dind:
-    # machine executor gives you full Docker daemon + BuildKit
+    # machine executor gives you full Docker daemon + BuildKit.
+    # docker_layer_caching preserves the BuildKit cache volume across
+    # builds on the same node (~200 credits/job, but each subsequent
+    # build skips unchanged layers AND reuses BuildKit's pip cache
+    # mounts — massive win for the torch + 28-custom-node Dockerfile).
     machine:
       image: ubuntu-2404:current
-      docker_layer_caching: false
+      docker_layer_caching: true
+    resource_class: xlarge
     environment:
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1
@@ -46,16 +51,31 @@ jobs:
           message: "A Docker build for comfyui-wan-template has started."
 
       - run:
-          name: Build & push without cache
+          name: Build & push (DLC + registry cache)
           command: |
             TAG="${CIRCLE_TAG:-latest}"
             IMG="docker.io/$DOCKERHUB_USER/comfyui-wan-template"
+            CACHE_TAG="buildcache"
 
+            # Seed BuildKit from the previous build's cache image, if any.
+            # Best-effort: first build (no prior cache) is a no-op miss.
+            docker pull "${IMG}:${CACHE_TAG}" || true
+
+            # BUILDKIT_INLINE_CACHE=1 embeds layer metadata in the output
+            # image so future --cache-from runs can read it.
             docker build \
               --progress=plain \
+              --cache-from "${IMG}:${CACHE_TAG}" \
+              --build-arg BUILDKIT_INLINE_CACHE=1 \
               -t "${IMG}:${TAG}" .
 
+            # Push the version tag (what users pull).
             docker push "${IMG}:${TAG}"
+
+            # Refresh the cache tag so the next build has a current seed.
+            # Kept on a dedicated tag so :latest is never implicitly touched.
+            docker tag "${IMG}:${TAG}" "${IMG}:${CACHE_TAG}"
+            docker push "${IMG}:${CACHE_TAG}"
 
             touch /tmp/build_success
 
