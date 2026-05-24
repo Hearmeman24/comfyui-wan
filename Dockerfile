@@ -49,7 +49,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # ComfyUI install
 # ------------------------------------------------------------
 RUN --mount=type=cache,target=/root/.cache/pip \
-    /usr/bin/yes | comfy --workspace /ComfyUI install
+    /usr/bin/yes | comfy --workspace /ComfyUI install \
+    && rm -rf /ComfyUI/.venv
 
 FROM base AS final
 # Make sure to use the virtual environment here too
@@ -105,5 +106,6 @@ RUN for repo in \
 COPY src/start_script.sh /start_script.sh
 RUN chmod +x /start_script.sh
 COPY 4xLSDIR.pth /4xLSDIR.pth
+COPY src/extra_model_paths.yaml /ComfyUI/extra_model_paths.yaml
 
 CMD ["/start_script.sh"]

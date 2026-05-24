@@ -1,0 +1,22 @@
+# Maps ComfyUI model types + custom_nodes to the network volume paths.
+# The Docker image bakes ComfyUI + custom nodes at /ComfyUI (ephemeral),
+# but anything users care about across restarts lives at /workspace/ComfyUI/.
+# This layout matches the pre-v13 on-disk structure, so existing pod
+# volumes work without migration.
+network_volume:
+    base_path: /workspace/ComfyUI
+    checkpoints: models/checkpoints
+    clip: models/clip
+    clip_vision: models/clip_vision
+    controlnet: models/controlnet
+    diffusion_models: models/diffusion_models
+    embeddings: models/embeddings
+    loras: models/loras
+    style_models: models/style_models
+    text_encoders: models/text_encoders
+    unet: models/unet
+    upscale_models: models/upscale_models
+    latent_upscale_models: models/latent_upscale_models
+    detection: models/detection
+    vae: models/vae
+    custom_nodes: custom_nodes

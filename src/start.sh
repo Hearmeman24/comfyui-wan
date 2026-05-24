@@ -42,17 +42,18 @@ else
     jupyter-lab --ip=0.0.0.0 --allow-root --no-browser --NotebookApp.token='' --NotebookApp.password='' --ServerApp.allow_origin='*' --ServerApp.allow_credentials=True --notebook-dir=/workspace &
 fi
 
-COMFYUI_DIR="$NETWORK_VOLUME/ComfyUI"
-WORKFLOW_DIR="$NETWORK_VOLUME/ComfyUI/user/default/workflows"
+# ComfyUI source stays in the image (ephemeral, fast local disk). Models,
+# workflows, outputs, inputs, and user-added custom_nodes live on the
+# network volume via extra_model_paths.yaml + --user/output/input-directory
+# flags. This avoids the 5-minute mv of /ComfyUI to MooseFS on first boot.
+COMFYUI_DIR="/ComfyUI"
+PERSIST_ROOT="$NETWORK_VOLUME/ComfyUI"
+WORKFLOW_DIR="$PERSIST_ROOT/user/default/workflows"
+CUSTOM_NODES_DIR="$COMFYUI_DIR/custom_nodes"
 
-# Set the target directory
-CUSTOM_NODES_DIR="$NETWORK_VOLUME/ComfyUI/custom_nodes"
-
-if [ ! -d "$COMFYUI_DIR" ]; then
-    mv /ComfyUI "$COMFYUI_DIR"
-else
-    echo "Directory already exists, skipping move."
-fi
+mkdir -p "$PERSIST_ROOT/models" "$PERSIST_ROOT/user" \
+         "$PERSIST_ROOT/output" "$PERSIST_ROOT/input" \
+         "$PERSIST_ROOT/custom_nodes"
 
 echo "Downloading CivitAI download script to /usr/local/bin"
 git clone "https://github.com/Hearmeman24/CivitAI_Downloader.git" || { echo "Git clone failed"; exit 1; }
@@ -79,7 +80,7 @@ for entry in "${CUSTOM_NODE_REPOS[@]}"; do
     pin=""
     [[ "$entry" == *"|"* ]] && pin="${entry#*|}"
     name="$(basename "$url" .git)"
-    dir="$NETWORK_VOLUME/ComfyUI/custom_nodes/$name"
+    dir="$CUSTOM_NODES_DIR/$name"
     if [ ! -d "$dir" ]; then
         git clone "$url" "$dir"
     else
@@ -93,19 +94,19 @@ done
 
 
 echo "🔧 Installing KJNodes packages..."
-pip install -r $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-KJNodes/requirements.txt &
+pip install -r $CUSTOM_NODES_DIR/ComfyUI-KJNodes/requirements.txt &
 KJ_PID=$!
 
 echo "🔧 Installing WanVideoWrapper packages..."
-pip install -r $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper/requirements.txt &
+pip install -r $CUSTOM_NODES_DIR/ComfyUI-WanVideoWrapper/requirements.txt &
 WAN_PID=$!
 
 echo "🔧 Installing VibeVoice packages..."
-pip install -r $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-VibeVoice/requirements.txt &
+pip install -r $CUSTOM_NODES_DIR/ComfyUI-VibeVoice/requirements.txt &
 VIBE_PID=$!
 
 echo "🔧 Installing WanAnimatePreprocess packages..."
-pip install -r $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-WanAnimatePreprocess/requirements.txt &
+pip install -r $CUSTOM_NODES_DIR/ComfyUI-WanAnimatePreprocess/requirements.txt &
 WAN_ANIMATE_PID=$!
 
 echo "🔧 Installing comfy-aimdo + comfy-kitchen..."
@@ -217,8 +218,8 @@ cd /
 
 if [ "$change_preview_method" == "true" ]; then
     echo "Updating default preview method..."
-    sed -i '/id: *'"'"'VHS.LatentPreview'"'"'/,/defaultValue:/s/defaultValue: false/defaultValue: true/' $NETWORK_VOLUME/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite/web/js/VHS.core.js
-    CONFIG_PATH="/ComfyUI/user/default/ComfyUI-Manager"
+    sed -i '/id: *'"'"'VHS.LatentPreview'"'"'/,/defaultValue:/s/defaultValue: false/defaultValue: true/' $CUSTOM_NODES_DIR/ComfyUI-VideoHelperSuite/web/js/VHS.core.js
+    CONFIG_PATH="$PERSIST_ROOT/user/default/ComfyUI-Manager"
     CONFIG_FILE="$CONFIG_PATH/config.ini"
 
 # Ensure the directory exists
@@ -303,7 +304,12 @@ fi
 
 echo "▶️  Starting ComfyUI"
 
-nohup python3 "$NETWORK_VOLUME/ComfyUI/main.py" --listen --enable-cors-header '*' --use-sage-attention > "$NETWORK_VOLUME/comfyui_${RUNPOD_POD_ID}_nohup.log" 2>&1 &
+nohup python3 "$COMFYUI_DIR/main.py" --listen --enable-cors-header '*' --use-sage-attention \
+    --extra-model-paths-config "$COMFYUI_DIR/extra_model_paths.yaml" \
+    --user-directory "$PERSIST_ROOT/user" \
+    --output-directory "$PERSIST_ROOT/output" \
+    --input-directory "$PERSIST_ROOT/input" \
+    > "$NETWORK_VOLUME/comfyui_${RUNPOD_POD_ID}_nohup.log" 2>&1 &
 
     # Counter for timeout
     counter=0
