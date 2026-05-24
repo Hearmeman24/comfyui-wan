@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 git clone https://github.com/Hearmeman24/comfyui-wan.git
 mv comfyui-wan/src/start.sh /
 mv comfyui-wan/src/hf_download_manager.py /
