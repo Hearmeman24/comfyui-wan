@@ -55,6 +55,26 @@ mkdir -p "$PERSIST_ROOT/models" "$PERSIST_ROOT/user" \
          "$PERSIST_ROOT/output" "$PERSIST_ROOT/input" \
          "$PERSIST_ROOT/custom_nodes"
 
+# Symlink user/output/input into /ComfyUI so ComfyUI uses its default
+# code paths (passing --user-directory triggers a None-user_dir bug in
+# user_manager.get_users on the current ComfyUI revision). Models +
+# custom_nodes still go through extra_model_paths.yaml (below) because
+# we want the *additive* behavior — image-baked custom_nodes + user
+# additions — not a wholesale replacement.
+if [ "$NETWORK_VOLUME" != "/" ]; then
+    # First boot only: migrate baked user/ content (default templates,
+    # schema) to the volume before swapping in the symlink. cp -an is
+    # no-clobber, so re-runs on existing volumes are safe.
+    if [ -d "$COMFYUI_DIR/user" ] && [ ! -L "$COMFYUI_DIR/user" ]; then
+        cp -an "$COMFYUI_DIR/user/." "$PERSIST_ROOT/user/" 2>/dev/null || true
+        rm -rf "$COMFYUI_DIR/user"
+    fi
+    for sub in user output input; do
+        [ -L "$COMFYUI_DIR/$sub" ] || rm -rf "$COMFYUI_DIR/$sub" 2>/dev/null || true
+        ln -sfn "$PERSIST_ROOT/$sub" "$COMFYUI_DIR/$sub"
+    done
+fi
+
 # Generate extra_model_paths.yaml from the live $PERSIST_ROOT so paths
 # always match the actual network volume (not a baked-in /workspace
 # assumption). Skip the file + flag when there's no real persistent
@@ -337,9 +357,6 @@ echo "▶️  Starting ComfyUI"
 
 nohup python3 "$COMFYUI_DIR/main.py" --listen --enable-cors-header '*' --use-sage-attention \
     $EXTRA_PATHS_FLAG \
-    --user-directory "$PERSIST_ROOT/user" \
-    --output-directory "$PERSIST_ROOT/output" \
-    --input-directory "$PERSIST_ROOT/input" \
     > "$NETWORK_VOLUME/comfyui_${RUNPOD_POD_ID}_nohup.log" 2>&1 &
 
     # Counter for timeout
