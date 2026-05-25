@@ -111,8 +111,8 @@ git clone "https://github.com/Hearmeman24/CivitAI_Downloader.git" || { echo "Git
 mv CivitAI_Downloader/download_with_aria.py "/usr/local/bin/" || { echo "Move failed"; exit 1; }
 chmod +x "/usr/local/bin/download_with_aria.py" || { echo "Chmod failed"; exit 1; }
 rm -rf CivitAI_Downloader  # Clean up the cloned repo
-pip install onnxruntime-gpu &
-ONNX_PID=$!
+# onnxruntime-gpu is now installed at image build time (Dockerfile);
+# we verify + reinstall later if any runtime requirements clobber it.
 
 # Custom nodes to provision at boot. Format: "<git-url>" or "<git-url>|<pinned-sha>".
 CUSTOM_NODE_REPOS=(
@@ -332,7 +332,6 @@ declare -A INSTALL_PIDS=(
     [WanVideoWrapper]=$WAN_PID
     [VibeVoice]=$VIBE_PID
     [WanAnimatePreprocess]=$WAN_ANIMATE_PID
-    [onnxruntime-gpu]=$ONNX_PID
     [comfy-aimdo+comfy-kitchen]=$COMFY_EXTRAS_PID
 )
 for name in "${!INSTALL_PIDS[@]}"; do
@@ -343,6 +342,17 @@ for name in "${!INSTALL_PIDS[@]}"; do
         exit 1
     fi
 done
+
+# Defensive: verify onnxruntime exposes the CUDA provider. If a custom
+# node's requirements pulled in plain onnxruntime (CPU) and it
+# shadowed the image's onnxruntime-gpu, reinstall the GPU build.
+if ! /opt/venv/bin/python -c \
+    'import onnxruntime as o, sys; sys.exit(0 if "CUDAExecutionProvider" in o.get_available_providers() else 1)' \
+    2>/dev/null; then
+    echo "⚙️  onnxruntime CUDA provider missing — reinstalling onnxruntime-gpu..."
+    pip uninstall -y onnxruntime onnxruntime-gpu 2>/dev/null || true
+    pip install onnxruntime-gpu
+fi
 
 echo "Renaming loras downloaded as zip files to safetensors files"
 cd $LORAS_DIR

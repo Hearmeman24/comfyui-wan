@@ -105,6 +105,15 @@ RUN for repo in \
         fi; \
     done
 
+# Force GPU onnxruntime. Several custom node requirements.txt files
+# pull in plain `onnxruntime` (CPU) which shadows our GPU install
+# because both packages provide the same `onnxruntime` Python module —
+# last install wins. Reinstalling after the clone loop guarantees the
+# image ships with the CUDA provider available.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip uninstall -y onnxruntime onnxruntime-gpu 2>/dev/null || true; \
+    pip install onnxruntime-gpu
+
 # ComfyUI-Manager. Cloned as lowercase `comfyui-manager` so it loads
 # after the other custom_nodes (ComfyUI loads alphabetically — capital
 # letters first), which is required for Manager to detect IMPORT FAILED
