@@ -49,7 +49,13 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # ComfyUI install — direct clone + pip install. Replaces comfy-cli,
 # which used to clone the same repo and create a private .venv we then
 # deleted anyway. Simpler, fewer indirection layers, no ~7 GB .venv.
+#
+# The ADD below fetches the current master ref from the GitHub API on
+# every build; its content changes whenever ComfyUI master moves, which
+# invalidates the clone layer. Without it, docker_layer_caching would
+# keep serving the ComfyUI baked into the previous build's cache.
 # ------------------------------------------------------------
+ADD https://api.github.com/repos/comfyanonymous/ComfyUI/git/refs/heads/master /comfyui-master-ref.json
 RUN --mount=type=cache,target=/root/.cache/pip \
     git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /ComfyUI \
     && pip install -r /ComfyUI/requirements.txt
