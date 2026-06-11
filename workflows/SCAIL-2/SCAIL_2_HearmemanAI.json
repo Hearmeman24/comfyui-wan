@@ -1269,64 +1269,6 @@
       ]
     },
     {
-      "id": 561,
-      "type": "MarkdownNote",
-      "pos": [
-        624.7605997549758,
-        -600.1098660320279
-      ],
-      "size": [
-        1026.1667097107438,
-        456.83948863636357
-      ],
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {
-        "ue_properties": {
-          "widget_ue_connectable": {},
-          "version": "7.8",
-          "input_ue_unconnectable": {}
-        }
-      },
-      "widgets_values": [
-        "# Wan Animate God Mode V4 \u2014 Quick Tutorial\n\nA character-driven video animation workflow built on Wan 2.2. Drive a reference image with a video, then refine the face and skin detail in a second pass.\n\n## What you need\n\n- **GPU**: RTX PRO 6000 recommended\n- **Inputs**: one reference image + one driving video\n- **Optional but recommended**: a character LoRA (Wan 2.2 **Low Noise** variant)\n\n## Steps\n\n1. **Load the workflow** in ComfyUI.\n2. **Load Image** \u2014 drop in your character / reference image.\n3. **Load Video** \u2014 drop in the driving video (motion source).\n4. **Tune the Denoise value** on the face & detail pass:\n   - **Higher denoise** \u2192 stronger facial likeness, sharper skin and overall detail.\n   - **Lower denoise** \u2192 softer, smoother, more \"plasticky\" skin and a lighter refinement pass.\n5. **(Recommended) Plug in a character LoRA**:\n   - Use the **Wan 2.2 Low Noise** variant of the LoRA.\n   - Load it in the **Optional Character LoRA (Low Noise)** node on the **left** side of the graph.\n   - Also load it **above the face & detail pass** on the **right** side of the graph.\n6. **Queue prompt** and let it run.\n\n## Tips\n\n- Start denoise low, do one run, then push it up until the face locks in without overcooking the skin.\n- A trained character LoRA dramatically improves identity consistency \u2014 don't skip it if you have one.\n- Keep the driving video's framing close to your reference image for cleaner results.\n"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
-      "id": 416,
-      "type": "MarkdownNote",
-      "pos": [
-        639.527401882813,
-        -79.24461700293004
-      ],
-      "size": [
-        977.2109326171876,
-        191.53787994384766
-      ],
-      "flags": {},
-      "order": 14,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {
-        "ue_properties": {
-          "widget_ue_connectable": {},
-          "version": "7.1",
-          "input_ue_unconnectable": {}
-        }
-      },
-      "widgets_values": [
-        "# Wan Animate V4 (Whop Exclusive) by HearmemanAI\n\n## This workflow is a Whop exclusive (https://whop.com/joined/hearmemanai/products/wan-animate-god-mode/)\n## If you got this anywhere else, shame on you. \n\n# To get support, reach out in the #premium-workflows channel on Discord after linking your account through Whop.\n\n"
-      ],
-      "color": "#323",
-      "bgcolor": "#535"
-    },
-    {
       "id": 566,
       "type": "SCAIL2ColoredMask",
       "pos": [
