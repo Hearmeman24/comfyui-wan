@@ -2,7 +2,8 @@
 """Workflow-driven model provisioner.
 
 Reads enabled flags (download_wan21, download_wan22, download_wan_animate,
-download_steady_dancer), walks the matching workflow folders, resolves model
+download_steady_dancer, DOWNLOAD_SCAIL2), walks the matching workflow folders,
+resolves model
 basenames against models_registry.json, emits a tab-separated download manifest
 for hf_download_manager.py, and copies the selected workflow JSONs into the
 user's ComfyUI workflows directory.
@@ -25,6 +26,7 @@ FLAG_DIRS = {
     "download_wan22": ["Wan 2.2", "SVI_Video_Extension_Wan2.2"],
     "download_wan_animate": ["Wan Animate"],
     "download_steady_dancer": ["Steady Dancer"],
+    "DOWNLOAD_SCAIL2": ["SCAIL-2"],
 }
 
 # Fetched at runtime by custom nodes (controlnet_aux, segment-anything-2, etc.)

@@ -179,17 +179,18 @@ cd "$CUSTOM_NODES_DIR" || exit 1
 #
 # Recognized flags (env vars set to "true"):
 #   download_wan21   download_wan22   download_wan_animate   download_steady_dancer
+#   DOWNLOAD_SCAIL2
 # ---------------------------------------------------------------
 HF_QUEUE_FILE="/tmp/hf_download_queue.tsv"
 PROVISIONER_FLAGS=()
-for v in download_wan21 download_wan22 download_wan_animate download_steady_dancer; do
+for v in download_wan21 download_wan22 download_wan_animate download_steady_dancer DOWNLOAD_SCAIL2; do
     if [ "${!v}" = "true" ]; then
         PROVISIONER_FLAGS+=(--flag "$v")
     fi
 done
 
 if [ ${#PROVISIONER_FLAGS[@]} -eq 0 ]; then
-    echo "ℹ️  No download_wan21/wan22/wan_animate/steady_dancer flag enabled — skipping model phase."
+    echo "ℹ️  No download_wan21/wan22/wan_animate/steady_dancer/DOWNLOAD_SCAIL2 flag enabled — skipping model phase."
     : > "$HF_QUEUE_FILE"
 else
     python3 /workflow_provisioner.py \
