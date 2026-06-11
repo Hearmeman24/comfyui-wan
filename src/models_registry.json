@@ -51,6 +51,10 @@
     "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors",
     "subdir": "text_encoders"
   },
+  "sam3.1_multiplex_fp16.safetensors": {
+    "url": "https://huggingface.co/Comfy-Org/sam3.1/resolve/main/checkpoints/sam3.1_multiplex_fp16.safetensors",
+    "subdir": "checkpoints"
+  },
   "umt5-xxl-enc-bf16.safetensors": {
     "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/umt5-xxl-enc-bf16.safetensors",
     "subdir": "text_encoders"
@@ -67,6 +71,10 @@
   "vitpose_h_wholebody_model.onnx": {
     "url": "https://huggingface.co/Kijai/vitpose_comfy/resolve/main/onnx/vitpose_h_wholebody_model.onnx",
     "subdir": "detection"
+  },
+  "wan2.1_14B_SCAIL_2_fp8_scaled.safetensors": {
+    "url": "https://huggingface.co/Comfy-Org/SCAIL-2/resolve/main/diffusion_models/wan2.1_14B_SCAIL_2_fp8_scaled.safetensors",
+    "subdir": "diffusion_models"
   },
   "wan2.1_i2v_480p_14B_bf16.safetensors": {
     "url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_480p_14B_bf16.safetensors",
