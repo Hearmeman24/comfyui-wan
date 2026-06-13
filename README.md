@@ -1,5 +1,7 @@
 # Created by HearmemanAI https://www.hearmemanai.com
 
+[![Sponsor](https://readme.cash/i/pift670zt5.svg)](https://readme.cash/c/pift670zt5)
+
 # Troubleshooting guide in case you encounter any errors:
 [click here](https://docs.google.com/document/d/1822H-x7AevWz2T_jzMu8-9e5UlQ-zrH0FhCFmQ6FtRc/edit?usp=sharing)
 ---
