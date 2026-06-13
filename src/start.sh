@@ -143,6 +143,23 @@ for entry in "${CUSTOM_NODE_REPOS[@]}"; do
     fi
 done
 
+# OpenRouter node — provisioned alongside the Wan Animate and SCAIL-2 flows.
+OPENROUTER_PID=""
+if [ "$download_wan_animate" = "true" ] || [ "$DOWNLOAD_SCAIL2" = "true" ]; then
+    OPENROUTER_DIR="$CUSTOM_NODES_DIR/ComfyUI-Openrouter_node"
+    if [ ! -d "$OPENROUTER_DIR" ]; then
+        git clone "https://github.com/gabe-init/ComfyUI-Openrouter_node.git" "$OPENROUTER_DIR"
+    else
+        echo "Updating ComfyUI-Openrouter_node"
+        git -C "$OPENROUTER_DIR" pull
+    fi
+    if [ -f "$OPENROUTER_DIR/requirements.txt" ]; then
+        echo "🔧 Installing OpenRouter node packages..."
+        pip install -r "$OPENROUTER_DIR/requirements.txt" &
+        OPENROUTER_PID=$!
+    fi
+fi
+
 
 echo "🔧 Installing KJNodes packages..."
 pip install -r $CUSTOM_NODES_DIR/ComfyUI-KJNodes/requirements.txt &
@@ -335,6 +352,7 @@ declare -A INSTALL_PIDS=(
     [WanAnimatePreprocess]=$WAN_ANIMATE_PID
     [comfy-aimdo+comfy-kitchen]=$COMFY_EXTRAS_PID
 )
+[ -n "$OPENROUTER_PID" ] && INSTALL_PIDS[OpenRouter]=$OPENROUTER_PID
 for name in "${!INSTALL_PIDS[@]}"; do
     if wait "${INSTALL_PIDS[$name]}"; then
         echo "✅ $name install complete"
