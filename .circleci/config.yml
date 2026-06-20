@@ -77,6 +77,27 @@ jobs:
             docker tag "${IMG}:${TAG}" "${IMG}:${CACHE_TAG}"
             docker push "${IMG}:${CACHE_TAG}"
 
+            # --- Experimental CUDA 13 + NVFP4 image: same git tag, -cuda13 suffix ---
+            # Same Dockerfile, four CUDA ARGs overridden. Own cache tag so it never
+            # thrashes the cu128 layer cache.
+            CUDA13_CACHE_TAG="buildcache-cuda13"
+            docker pull "${IMG}:${CUDA13_CACHE_TAG}" || true
+
+            docker build \
+              --progress=plain \
+              --cache-from "${IMG}:${CUDA13_CACHE_TAG}" \
+              --build-arg BUILDKIT_INLINE_CACHE=1 \
+              --build-arg CUDA_BASE_IMAGE=nvidia/cuda:13.0.3-cudnn-devel-ubuntu24.04 \
+              --build-arg TORCH_PACKAGES="torch==2.11.0 torchvision==0.26.0 torchaudio==2.11.0" \
+              --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu130 \
+              --build-arg CUDA_VARIANT=cu130 \
+              -t "${IMG}:${TAG}-cuda13" .
+
+            docker push "${IMG}:${TAG}-cuda13"
+
+            docker tag "${IMG}:${TAG}-cuda13" "${IMG}:${CUDA13_CACHE_TAG}"
+            docker push "${IMG}:${CUDA13_CACHE_TAG}"
+
             touch /tmp/build_success
 
       - run:

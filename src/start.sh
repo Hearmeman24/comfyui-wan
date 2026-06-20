@@ -13,19 +13,54 @@ else
     echo "additional_params.sh not found in /workspace. Skipping..."
 fi
 
-# Start SageAttention build in the background
-echo "Starting SageAttention build..."
-(
-    export EXT_PARALLEL=4 NVCC_APPEND_FLAGS="--threads 8" MAX_JOBS=32
-    cd /tmp
-    git clone https://github.com/thu-ml/SageAttention.git
-    cd SageAttention
-    git reset --hard 68de379
-    pip install -e .
-    echo "SageAttention build completed" > /tmp/sage_build_done
-) > /tmp/sage_build.log 2>&1 &
-SAGE_PID=$!
-echo "SageAttention build started in background (PID: $SAGE_PID)"
+# SageAttention strategy.
+#   cu130 image: a prebuilt cu130 wheel is baked at /opt/sage. Install it and
+#   verify with a REAL kernel launch on this worker's GPU — import success isn't
+#   enough (an arch the wheel wasn't built for, e.g. B200/sm_100, imports but
+#   can't launch). If the probe passes we skip the source build entirely.
+#   Otherwise (cu128 image, an older image with no CUDA_VARIANT, or an
+#   unsupported GPU) fall back to building SageAttention from source.
+SAGE_FLAG=""
+SAGE_PID=""
+
+sage_kernel_probe() {
+    python3 - >/dev/null 2>&1 <<'PROBE'
+import torch
+from sageattention import sageattn
+q = torch.randn(1, 8, 128, 64, dtype=torch.float16, device="cuda")
+sageattn(q, q.clone(), q.clone())
+torch.cuda.synchronize()
+PROBE
+}
+
+SAGE_WHEEL=$(ls /opt/sage/sageattention-*.whl 2>/dev/null | head -n1)
+if [ "$CUDA_VARIANT" = "cu130" ] && [ -n "$SAGE_WHEEL" ]; then
+    echo "Installing baked SageAttention wheel: $SAGE_WHEEL"
+    pip install --no-deps "$SAGE_WHEEL" > /tmp/sage_wheel.log 2>&1
+    if sage_kernel_probe; then
+        echo "✅ SageAttention wheel kernel probe passed — skipping source build"
+        SAGE_FLAG="--use-sage-attention"
+    else
+        echo "⚠️  SageAttention wheel probe failed on this GPU — falling back to source build"
+    fi
+fi
+
+# Start SageAttention source build in the background (only if the wheel path
+# didn't already give us a working kernel).
+if [ -z "$SAGE_FLAG" ]; then
+    echo "Starting SageAttention build..."
+    (
+        export EXT_PARALLEL=4 NVCC_APPEND_FLAGS="--threads 8" MAX_JOBS=32
+        cd /tmp
+        git clone https://github.com/thu-ml/SageAttention.git
+        cd SageAttention
+        git reset --hard 68de379
+        pip install -e .
+        echo "SageAttention build completed" > /tmp/sage_build_done
+    ) > /tmp/sage_build.log 2>&1 &
+    SAGE_PID=$!
+    echo "SageAttention build started in background (PID: $SAGE_PID)"
+fi
 
 # Set the network volume path
 NETWORK_VOLUME="/workspace"
@@ -379,25 +414,28 @@ for file in *.zip; do
     mv "$file" "${file%.zip}.safetensors"
 done
 
-# Wait for SageAttention build to complete
-echo "Waiting for SageAttention build to complete..."
-while ps -p $SAGE_PID > /dev/null 2>&1 && ! [ -f /tmp/sage_build_done ]; do
-    echo "⚙️  SageAttention build in progress, this may take up to 5 minutes."
-    sleep 5
-done
+# Wait for the SageAttention source build to finish (only if we started one;
+# the baked-wheel path leaves SAGE_PID empty and SAGE_FLAG already set).
+if [ -n "$SAGE_PID" ]; then
+    echo "Waiting for SageAttention build to complete..."
+    while ps -p $SAGE_PID > /dev/null 2>&1 && ! [ -f /tmp/sage_build_done ]; do
+        echo "⚙️  SageAttention build in progress, this may take up to 5 minutes."
+        sleep 5
+    done
 
-if [ -f /tmp/sage_build_done ]; then
-    echo "✅ SageAttention build completed successfully!"
-else
-    echo "⚠️  SageAttention build process ended without a completion marker. Check logs at /tmp/sage_build.log"
-    echo "Continuing with ComfyUI startup..."
+    if [ -f /tmp/sage_build_done ] && sage_kernel_probe; then
+        echo "✅ SageAttention build completed successfully!"
+        SAGE_FLAG="--use-sage-attention"
+    else
+        echo "⚠️  SageAttention unavailable — starting ComfyUI without it. Check /tmp/sage_build.log"
+    fi
 fi
 
 # Start ComfyUI
 
 echo "▶️  Starting ComfyUI"
 
-nohup python3 "$COMFYUI_DIR/main.py" --listen --enable-cors-header '*' --use-sage-attention \
+nohup python3 "$COMFYUI_DIR/main.py" --listen --enable-cors-header '*' $SAGE_FLAG \
     $EXTRA_PATHS_FLAG \
     > "$NETWORK_VOLUME/comfyui_${RUNPOD_POD_ID}_nohup.log" 2>&1 &
 
@@ -410,9 +448,15 @@ nohup python3 "$COMFYUI_DIR/main.py" --listen --enable-cors-header '*' --use-sag
             echo "⚠️  ComfyUI should be up by now. If it's not running, there's probably an error."
             echo ""
             echo "🛠️  Troubleshooting Tips:"
-            echo "1. Make sure that your CUDA Version is set to 12.8/12.9 by selecting that in the additional filters tab before deploying the template"
-            echo "2. If you are deploying using network storage, try deploying without it"
-            echo "3. If you are using a B200 GPU, it is currently not supported"
+            if [ "$CUDA_VARIANT" = "cu130" ]; then
+                echo "1. This is the experimental CUDA 13 image. Make sure your CUDA Version is set to 13.0+ in the additional filters tab before deploying."
+                echo "2. If you are deploying using network storage, try deploying without it"
+                echo "3. NVFP4 quants only accelerate on Blackwell GPUs (RTX 50xx / sm_120); other GPUs fall back to fp16/fp8."
+            else
+                echo "1. Make sure that your CUDA Version is set to 12.8/12.9 by selecting that in the additional filters tab before deploying the template"
+                echo "2. If you are deploying using network storage, try deploying without it"
+                echo "3. If you are using a B200 GPU, it is currently not supported (try the -cuda13 image tag)"
+            fi
             echo "4. If all else fails, open the web terminal by clicking \"connect\", \"enable web terminal\" and running:"
             echo "   cat comfyui_${RUNPOD_POD_ID}_nohup.log"
             echo "   This should show a ComfyUI error. Please paste the error in HearmemanAI Discord Server for assistance."

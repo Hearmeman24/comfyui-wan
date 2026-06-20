@@ -23,6 +23,21 @@
 
 ---
 
+## 🧪 Experimental: CUDA 13 + NVFP4 (`-cuda13` tag)
+
+Every release also ships an experimental CUDA 13 image. To use it, append **`-cuda13`** to the
+image tag (e.g. `…/comfyui-wan-template:v12-cuda13` instead of `:v12`), or deploy from the
+experimental template.
+
+- **What you get:** PyTorch cu130, so **NVFP4** quants load natively on **Blackwell GPUs**
+  (RTX 50xx / sm_120). On other GPUs NVFP4 degrades to fp16/fp8 — no speedup, but it still runs.
+- **SageAttention** ships as a prebuilt cu130 wheel and is used automatically when your GPU
+  supports it; otherwise it's built from source on first boot (same as the standard image).
+- **Deploy with CUDA 13.0+** selected in Additional Filters.
+- The standard `:vN` image (CUDA 12.8) is unchanged — stay on it if you don't specifically need NVFP4.
+
+---
+
 ## ⚙️ Environment Variables
 
 Set the flags you want to **`true`** (lowercase, as strings). Multiple may be enabled at once — shared models are deduplicated automatically.
