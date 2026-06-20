@@ -9,13 +9,12 @@ ARG CUDA_BASE_IMAGE=nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
 FROM ${CUDA_BASE_IMAGE} AS base
 
 # Re-declare after FROM so the build stage can read them.
-# NOTE: cu128 installs torchvision+torchaudio only (NOT bare `torch`). The nightly
-# channel rotates daily and a bare `torch` grabs the newest build, which can be a day
-# ahead of torchvision/torchaudio — whose nightlies pin an EXACT older torch, giving
-# ResolutionImpossible. Letting vision/audio pull torch transitively guarantees a
-# coherent set on every build without hardcoding a (rotting) nightly date.
-ARG TORCH_PACKAGES="--pre torchvision torchaudio"
-ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/nightly/cu128
+# cu128 uses the STABLE torch channel (not nightly): the nightly trio rotates daily
+# and frequently skews (torch a day ahead of torchvision/torchaudio, which pin an
+# exact older torch -> ResolutionImpossible). Stable wheels are released together,
+# mutually coherent, and don't get garbage-collected — reproducible tag rebuilds.
+ARG TORCH_PACKAGES="torch torchvision torchaudio"
+ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cu128
 ARG CUDA_VARIANT=cu128
 ENV CUDA_VARIANT=${CUDA_VARIANT}
 
