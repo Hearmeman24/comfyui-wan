@@ -1,5 +1,18 @@
 # Use multi-stage build with caching optimizations
-FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04 AS base
+#
+# CUDA variant is parametrized. Defaults reproduce the proven CUDA 12.8 image
+# byte-for-byte; the cu130 tag overrides these four ARGs (see .circleci/config.yml):
+#   CUDA_BASE_IMAGE / TORCH_PACKAGES / TORCH_INDEX_URL / CUDA_VARIANT
+# cu130 is REQUIRED for native NVFP4 (cuBLAS 13.x FP4 matmul); on cu128 cuBLAS
+# returns NOT_SUPPORTED and ComfyUI falls back to fp16/fp8.
+ARG CUDA_BASE_IMAGE=nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
+FROM ${CUDA_BASE_IMAGE} AS base
+
+# Re-declare after FROM so the build stage can read them.
+ARG TORCH_PACKAGES="--pre torch torchvision torchaudio"
+ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/nightly/cu128
+ARG CUDA_VARIANT=cu128
+ENV CUDA_VARIANT=${CUDA_VARIANT}
 
 # Consolidated environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -28,8 +41,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 ENV PATH="/opt/venv/bin:$PATH"
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --pre torch torchvision torchaudio \
-        --index-url https://download.pytorch.org/whl/nightly/cu128
+    pip install ${TORCH_PACKAGES} \
+        --index-url ${TORCH_INDEX_URL}
+
+# Freeze the torch family so custom-node requirements.txt installs below cannot
+# upgrade/downgrade it (which on cu130 would silently drop NVFP4 support).
+RUN pip freeze | grep -E "^(torch|torchvision|torchaudio|torchsde)==" > /torch-constraint.txt
 
 # Core Python tooling
 RUN --mount=type=cache,target=/root/.cache/pip \
@@ -105,7 +122,8 @@ RUN for repo in \
             git clone "$repo"; \
         fi; \
         if [ -f "/ComfyUI/custom_nodes/$repo_dir/requirements.txt" ]; then \
-            pip install -r "/ComfyUI/custom_nodes/$repo_dir/requirements.txt"; \
+            pip install -r "/ComfyUI/custom_nodes/$repo_dir/requirements.txt" \
+                --constraint /torch-constraint.txt; \
         fi; \
         if [ -f "/ComfyUI/custom_nodes/$repo_dir/install.py" ]; then \
             python "/ComfyUI/custom_nodes/$repo_dir/install.py"; \
@@ -131,6 +149,20 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && if [ -f /ComfyUI/custom_nodes/comfyui-manager/requirements.txt ]; then \
          pip install -r /ComfyUI/custom_nodes/comfyui-manager/requirements.txt; \
        fi
+
+# Bake the prebuilt SageAttention cu130 wheel. start.sh installs it at runtime ONLY
+# on the cu130 variant (and only if a real kernel probe passes on the worker GPU);
+# the cu128 image carries the file but never uses it (the wheel links libcudart.so.13
+# and won't import on cu128). cp312 wheel matches this image's python3.12.
+COPY sageattention-2.2.0-cp312-cp312-linux_x86_64.whl /opt/sage/
+
+# cu130 build-time sanity check: fail fast if torch isn't CUDA 13 or sage can't load.
+# No-op on the cu128 default build.
+RUN if [ "$CUDA_VARIANT" = "cu130" ]; then \
+        python3 -c "import torch; assert torch.version.cuda.startswith('13'), torch.version.cuda; print('torch', torch.__version__)" && \
+        pip install --no-deps /opt/sage/sageattention-2.2.0-cp312-cp312-linux_x86_64.whl && \
+        python3 -c "import sageattention; print('sageattention import OK')"; \
+    fi
 
 COPY src/start_script.sh /start_script.sh
 RUN chmod +x /start_script.sh
