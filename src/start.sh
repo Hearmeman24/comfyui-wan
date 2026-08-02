@@ -327,6 +327,22 @@ else
     echo "2xLiveActionV1_SPAN already exists. Skipping."
 fi
 
+# 1x-ITF-SkinDiffDetail-Lite-v1 — skin-detail restorer for the Wan Animate
+# flows. Direct download (OpenModelDB object storage, not on HF, so not part
+# of the model registry/provisioner).
+if [ "$download_wan_animate" = "true" ]; then
+    ITF_DEST="$NETWORK_VOLUME/ComfyUI/models/upscale_models/1x-ITF-SkinDiffDetail-Lite-v1.pth"
+    if [ ! -f "$ITF_DEST" ]; then
+        echo "Downloading 1x-ITF-SkinDiffDetail-Lite-v1..."
+        aria2c -x 8 -s 8 --console-log-level=warn --summary-interval=0 \
+            -d "$(dirname "$ITF_DEST")" -o "$(basename "$ITF_DEST")" \
+            "https://objectstorage.us-phoenix-1.oraclecloud.com/n/ax6ygfvpvzka/b/open-modeldb-files/o/1x-ITF-SkinDiffDetail-Lite-v1.pth" \
+            || echo "⚠️  1x-ITF-SkinDiffDetail-Lite-v1 download failed (continuing)"
+    else
+        echo "1x-ITF-SkinDiffDetail-Lite-v1 already exists. Skipping."
+    fi
+fi
+
 echo "Finished downloading models!"
 
 
