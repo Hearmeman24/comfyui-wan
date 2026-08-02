@@ -343,6 +343,21 @@ if [ "$download_wan_animate" = "true" ]; then
     fi
 fi
 
+# rife426 — RIFE VFI weights for the frame-interpolation (60FPS) flows.
+# Direct download (GitHub release asset, not on HF, so not part of the model
+# registry/provisioner).
+mkdir -p "$NETWORK_VOLUME/ComfyUI/models/frame_interpolation"
+RIFE_DEST="$NETWORK_VOLUME/ComfyUI/models/frame_interpolation/rife426.pth"
+if [ ! -f "$RIFE_DEST" ]; then
+    echo "Downloading rife426..."
+    aria2c -x 8 -s 8 --console-log-level=warn --summary-interval=0 \
+        -d "$(dirname "$RIFE_DEST")" -o "$(basename "$RIFE_DEST")" \
+        "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation/releases/download/models/rife426.pth" \
+        || echo "⚠️  rife426 download failed (continuing)"
+else
+    echo "rife426 already exists. Skipping."
+fi
+
 echo "Finished downloading models!"
 
 
