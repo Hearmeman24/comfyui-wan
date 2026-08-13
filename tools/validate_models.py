@@ -1,100 +1,82 @@
 #!/usr/bin/env python3
-"""CI validator: registry coverage + URL reachability.
+"""Shim: run the shared runtime's model validator against this repo.
 
-- Coverage: every model basename referenced in workflows/**/*.json must be
-  either in src/models_registry.json, in the auto-download allowlist (fetched
-  by a custom node at runtime), or image-baked. Anything else is flagged as
-  user-supplied (warning, not error) — the user is expected to provide it via
-  CHECKPOINT_IDS/LORAS_IDS at runtime.
-- Reachability: every registry URL must return 200/301/302 on HEAD.
+The real validator lives in comfyui-runtime/tools/validate_models.py (the
+reconciled family superset: registry/workflow coverage incl. subgraphs and
+folder prefixes, HF model-API existence checks that follow repo renames,
+ranged-GET size checks). This shim fetches comfyui-runtime at the exact
+`runtime_ref` pinned in pins.json, so CI validates against the runtime this
+template actually boots, not whatever sits on the runtime's main.
 
-Exit non-zero on any reachability failure or unparseable workflow JSON.
+Extra args (e.g. --offline) pass straight through.
+
+Stdlib only.
 """
-import asyncio
 import json
 import os
-import re
+import subprocess
 import sys
 from pathlib import Path
 
-import httpx
-
-AUTO_DOWNLOAD = {
-    "rife49.pth",
-    "depth_anything_v2_vitl.pth",
-    "sam2_hiera_base_plus.safetensors",
-    "sam2.1_hiera_base_plus.safetensors",
-    "yolox_l.onnx",
-}
-IMAGE_BAKED = {"4xLSDIR.pth"}
-MODEL_PAT = re.compile(r'"([^"]+\.(?:safetensors|bin|onnx|pth|ckpt))"')
-
 REPO = Path(__file__).resolve().parents[1]
+RUNTIME_URL = "https://github.com/Hearmeman24/comfyui-runtime.git"
+# Reuse one cached clone across runs.
+CACHE = Path.home() / ".cache" / "comfyui-runtime-validator"
 
 
-def collect_workflow_refs() -> dict[str, set[str]]:
-    refs: dict[str, set[str]] = {}
-    for wf in (REPO / "workflows").rglob("*.json"):
-        try:
-            text = wf.read_text()
-        except Exception as e:
-            print(f"❌ cannot read workflow {wf}: {e}")
-            sys.exit(1)
-        try:
-            json.loads(text)
-        except Exception as e:
-            print(f"❌ invalid JSON in workflow {wf}: {e}")
-            sys.exit(1)
-        for m in MODEL_PAT.findall(text):
-            refs.setdefault(os.path.basename(m), set()).add(
-                str(wf.relative_to(REPO))
-            )
-    return refs
+def _git(*args: str) -> None:
+    subprocess.run(["git", "-C", str(CACHE), *args], check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-async def head(client: httpx.AsyncClient, url: str) -> tuple[int | None, str | None]:
+def resolve_runtime(ref: str) -> Path:
+    if not (CACHE / ".git").is_dir():
+        CACHE.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["git", "clone", "--quiet", RUNTIME_URL, str(CACHE)],
+                       check=True)
+    # Fetch only when the pinned ref is not already local, so repeat runs
+    # stay offline once the ref has been seen.
     try:
-        r = await client.head(url, follow_redirects=True, timeout=30)
-        return r.status_code, None
-    except Exception as e:
-        return None, str(e)
+        _git("rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}")
+    except subprocess.CalledProcessError:
+        _git("fetch", "--quiet", "origin", ref)
+        ref = "FETCH_HEAD"
+    _git("checkout", "--quiet", "--force", ref)
+    return CACHE
 
 
-async def main() -> int:
-    registry = json.loads((REPO / "src" / "models_registry.json").read_text())
-    refs = collect_workflow_refs()
+def runtime_dir() -> Path:
+    """The pinned runtime checkout.
 
-    warnings: list[str] = []
-    for b, wfs in sorted(refs.items()):
-        if b in AUTO_DOWNLOAD or b in IMAGE_BAKED or b in registry:
-            continue
-        warnings.append(f"user-supplied (not in registry): {b}  [{len(wfs)} workflow(s)]")
+    COMFYUI_RUNTIME_DIR points at a local runtime checkout, used AS IS (no
+    git ops on it), for working on the two repos side by side. Otherwise
+    pins.json's runtime_ref decides; a missing or malformed pins.json is a
+    one-line FATAL, never a silent fallback.
+    """
+    local = os.environ.get("COMFYUI_RUNTIME_DIR")
+    if local:
+        return Path(local)
+    try:
+        ref = json.loads((REPO / "pins.json").read_text())["runtime_ref"]
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        raise SystemExit(
+            f"FATAL: could not read runtime_ref from pins.json: {e}")
+    try:
+        return resolve_runtime(ref)
+    except subprocess.CalledProcessError as e:
+        raise SystemExit(
+            f"FATAL: could not fetch comfyui-runtime at runtime_ref {ref!r}: {e}")
 
-    errors: list[str] = []
-    async with httpx.AsyncClient(http2=True) as client:
-        urls = [(b, e["url"]) for b, e in registry.items()]
-        results = await asyncio.gather(*[head(client, u) for _, u in urls])
-    for (b, url), (status, err) in zip(urls, results):
-        if err:
-            errors.append(f"UNREACHABLE: {b}: {err} ({url})")
-        elif status not in (200, 301, 302):
-            errors.append(f"BAD STATUS {status}: {b} -> {url}")
 
-    if warnings:
-        print(f"⚠️  {len(warnings)} warning(s):")
-        for w in warnings:
-            print(f"   {w}")
-    if errors:
-        print(f"❌ {len(errors)} reachability error(s):")
-        for e in errors:
-            print(f"   {e}")
-        return 1
-    print(
-        f"✅ registry ok: {len(registry)} entries, all URLs reachable; "
-        f"{len(refs)} unique basenames referenced across workflows"
-    )
-    return 0
+def main() -> int:
+    runtime = runtime_dir()
+    cmd = [sys.executable, str(runtime / "tools" / "validate_models.py"),
+           "--registry", str(REPO / "src" / "models_registry.json"),
+           "--workflows", str(REPO / "workflows"),
+           "--template", str(REPO / "template.json"),
+           *sys.argv[1:]]
+    return subprocess.run(cmd).returncode
 
 
 if __name__ == "__main__":
-    sys.exit(asyncio.run(main()))
+    raise SystemExit(main())

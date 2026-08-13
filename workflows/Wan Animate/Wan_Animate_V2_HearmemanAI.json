@@ -3362,7 +3362,7 @@
         }
       },
       "widgets_values": [
-        "A photorealistic video with visible lens flare and chromatic aberration showing Sydney01, her light brown hair cascading down her shoulders and her light blue eyes are glistening.\nShe is performing a dance for the viewer"
+        "A photorealistic video with visible lens flare and chromatic aberration showing a woman, her light brown hair cascading down her shoulders and her light blue eyes are glistening.\nShe is performing a dance for the viewer"
       ],
       "color": "#232",
       "bgcolor": "#353"
@@ -4247,7 +4247,7 @@
         }
       },
       "widgets_values": [
-        "Sydney01_LowNoise.safetensors",
+        "Your_Character_LoRA_Here.safetensors",
         0.8
       ],
       "color": "#323",

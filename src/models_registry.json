@@ -1,6 +1,22 @@
 {
+  "1x-ITF-SkinDiffDetail-Lite-v1.pth": {
+    "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/upscale_models/1x-ITF-SkinDiffDetail-Lite-v1.pth",
+    "subdir": "upscale_models",
+    "upstream_url": "https://objectstorage.us-phoenix-1.oraclecloud.com/n/ax6ygfvpvzka/b/open-modeldb-files/o/1x-ITF-SkinDiffDetail-Lite-v1.pth"
+  },
+  "2xLiveActionV1_SPAN_490000.pth": {
+    "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/upscale_models/2xLiveActionV1_SPAN_490000.pth",
+    "subdir": "upscale_models",
+    "min_size_mb": 5,
+    "upstream_url": "https://raw.githubusercontent.com/jcj83429/upscaling/f73a3a02874360ec6ced18f8bdd8e43b5d7bba57/2xLiveActionV1_SPAN/2xLiveActionV1_SPAN_490000.pth"
+  },
   "4x-ClearRealityV1_Soft.pth": {
     "url": "https://huggingface.co/Kim2091/ClearRealityV1/resolve/main/4x-ClearRealityV1_Soft.pth",
+    "subdir": "upscale_models",
+    "min_size_mb": 5
+  },
+  "4xLSDIR.pth": {
+    "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/upscale_models/4xLSDIR.pth",
     "subdir": "upscale_models"
   },
   "SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors": {
@@ -78,7 +94,8 @@
   },
   "vitpose_h_wholebody_model.onnx": {
     "url": "https://huggingface.co/Kijai/vitpose_comfy/resolve/main/onnx/vitpose_h_wholebody_model.onnx",
-    "subdir": "detection"
+    "subdir": "detection",
+    "min_size_mb": 0.2
   },
   "wan2.1_14B_SCAIL_2_fp8_scaled.safetensors": {
     "url": "https://huggingface.co/Comfy-Org/SCAIL-2/resolve/main/diffusion_models/wan2.1_14B_SCAIL_2_fp8_scaled.safetensors",
@@ -139,5 +156,10 @@
   "yolov10m.onnx": {
     "url": "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B/resolve/main/process_checkpoint/det/yolov10m.onnx",
     "subdir": "detection"
+  },
+  "rife426.pth": {
+    "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/frame_interpolation/rife426.pth",
+    "subdir": "frame_interpolation",
+    "upstream_url": "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation/releases/download/models/rife426.pth"
   }
 }

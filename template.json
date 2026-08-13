@@ -1,0 +1,75 @@
+{
+  "template_repo": "https://github.com/Hearmeman24/comfyui-wan.git",
+  "branch": "master",
+  "provisioning_mode": "walk",
+  "flags": {
+    "download_wan21": {
+      "folders": [
+        "Wan 2.1",
+        "Infinite Talk"
+      ],
+      "extra_models": [
+        "rife426.pth"
+      ]
+    },
+    "download_wan22": {
+      "folders": [
+        "Wan 2.2",
+        "SVI_Video_Extension_Wan2.2"
+      ],
+      "extra_models": [
+        "rife426.pth"
+      ]
+    },
+    "download_wan_animate": {
+      "folders": [
+        "Wan Animate"
+      ],
+      "extra_models": [
+        "1x-ITF-SkinDiffDetail-Lite-v1.pth",
+        "rife426.pth"
+      ]
+    },
+    "download_steady_dancer": {
+      "folders": [
+        "Steady Dancer"
+      ],
+      "extra_models": [
+        "rife426.pth"
+      ]
+    },
+    "DOWNLOAD_SCAIL2": {
+      "folders": [
+        "SCAIL-2"
+      ],
+      "extra_models": [
+        "rife426.pth"
+      ]
+    }
+  },
+  "auto_download": [
+    "rife49.pth",
+    "depth_anything_v2_vitl.pth",
+    "sam2_hiera_base_plus.safetensors",
+    "sam2.1_hiera_base_plus.safetensors",
+    "yolox_l.onnx",
+    "dw-ll_ucoco_384_bs5.torchscript.pt",
+    "film_net_fp32.pt"
+  ],
+  "models_symlink": false,
+  "custom_nodes": {
+    "target": "image",
+    "repos": [
+      "https://github.com/kijai/ComfyUI-WanVideoWrapper.git",
+      "https://github.com/kijai/ComfyUI-KJNodes.git|204f6d5",
+      "https://github.com/wildminder/ComfyUI-VibeVoice.git",
+      "https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git",
+      "https://github.com/obisin/ComfyUI-FSampler.git",
+      "https://github.com/cmeka/ComfyUI-WanMoEScheduler.git",
+      "https://github.com/lrzjason/ComfyUI-VAE-Utils.git",
+      "https://github.com/wallen0322/ComfyUI-Wan22FMLF.git",
+      "https://github.com/gabe-init/ComfyUI-Openrouter_node.git"
+    ]
+  },
+  "sage": true
+}
