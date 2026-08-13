@@ -9,7 +9,7 @@
 > ⚠️ **Breaking change for existing users.**
 > The old per-resolution / per-feature flags are gone. If you're updating an existing pod template, **delete** the removed env vars below and **add** the new ones — otherwise nothing will download.
 
-> ⚠️ **CUDA 12.8 required.** Before deploying, open Additional Filters and select CUDA 12.8.
+> ⚠️ **CUDA 13.0+ required.** Before deploying, open Additional Filters and select CUDA 13.0 or higher. The image is built on CUDA 13; it will not run on a CUDA 12.8 host.
 > Fallback (older CUDA): https://runpod.io/console/deploy?template=0b7tk92912&ref=uyjfcrgy
 
 ---
@@ -23,18 +23,12 @@
 
 ---
 
-## 🧪 Experimental: CUDA 13 + NVFP4 (`-cuda13` tag)
+## CUDA 13
 
-Every release also ships an experimental CUDA 13 image. To use it, append **`-cuda13`** to the
-image tag (e.g. `…/comfyui-wan-template:v12-cuda13` instead of `:v12`), or deploy from the
-experimental template.
-
-- **What you get:** PyTorch cu130, so **NVFP4** quants load natively on **Blackwell GPUs**
-  (RTX 50xx / sm_120). On other GPUs NVFP4 degrades to fp16/fp8 — no speedup, but it still runs.
-- **SageAttention** ships as a prebuilt cu130 wheel and is used automatically when your GPU
-  supports it; otherwise it's built from source on first boot (same as the standard image).
-- **Deploy with CUDA 13.0+** selected in Additional Filters.
-- The standard `:vN` image (CUDA 12.8) is unchanged — stay on it if you don't specifically need NVFP4.
+The image is CUDA 13 only. There is no separate `-cuda13` tag any more; the standard `:vN` tag
+is the CUDA 13 image. PyTorch is cu130, so **NVFP4** quants load natively on **Blackwell GPUs**
+(RTX 50xx / sm_120); on other GPUs NVFP4 degrades to fp16/fp8. SageAttention ships as a
+prebuilt wheel and is used automatically when your GPU supports it.
 
 ---
 
@@ -50,6 +44,7 @@ Set the flags you want to **`true`** (lowercase, as strings). Multiple may be en
 | `download_wan22` | Wan 2.2 + SVI Video Extension workflows + their models |
 | `download_wan_animate` | Wan Animate workflows + models |
 | `download_steady_dancer` | Steady Dancer workflow + models |
+| `DOWNLOAD_SCAIL2` | SCAIL-2 workflow + models (note: uppercase) |
 
 Only the workflows for enabled flags are copied into your ComfyUI workflows folder — you'll see exactly what your models can run.
 

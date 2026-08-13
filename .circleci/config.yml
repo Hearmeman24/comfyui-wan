@@ -1,13 +1,10 @@
-# .circleci/config.yml  (CircleCI 2.1)
 version: 2.1
 
 executors:
   docker-dind:
-    # machine executor gives you full Docker daemon + BuildKit.
-    # docker_layer_caching preserves the BuildKit cache volume across
-    # builds on the same node (~200 credits/job, but each subsequent
-    # build skips unchanged layers AND reuses BuildKit's pip cache
-    # mounts — massive win for the torch + 28-custom-node Dockerfile).
+    # docker_layer_caching preserves the BuildKit cache volume across builds
+    # on the same node, and the buildcache registry tag (below) seeds
+    # --cache-from.
     machine:
       image: ubuntu-2404:current
       docker_layer_caching: true
@@ -15,6 +12,10 @@ executors:
     environment:
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1
+
+  python:
+    docker:
+      - image: cimg/python:3.12
 
 commands:
   notify-flowbot:
@@ -37,11 +38,64 @@ commands:
               -d "{\"message\": \"<< parameters.message >>\", \"source\": \"circleci\"}"
 
 jobs:
+  # Cheap static checks, mirroring comfyui-runtime's verify job: shell syntax,
+  # shellcheck, python byte-compile, JSON validity. No contexts needed.
+  verify:
+    executor: python
+    steps:
+      - checkout
+      - run:
+          name: Install shellcheck
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq shellcheck
+      - run:
+          name: Shell syntax (bash -n)
+          command: |
+            find src tools -name '*.sh' -print0 | xargs -0 -r -n1 bash -n
+      - run:
+          name: shellcheck (severity=error)
+          command: |
+            find src tools -name '*.sh' -print0 | xargs -0 -r shellcheck --severity=error
+      - run:
+          name: Python byte-compile
+          command: |
+            find src tools -name '*.py' -print0 | xargs -0 -r python3 -m py_compile
+      - run:
+          name: JSON parse every .json in the repo
+          command: |
+            find . -path ./.git -prune -o -name '*.json' -print0 | xargs -0 -r -n1 python3 -m json.tool > /dev/null
+      - run:
+          name: onnxruntime CUDA-provider gate in Dockerfile
+          command: |
+            # The runtime repo's equivalent gate only scans its own tree, so
+            # this repo must carry the check itself: the Dockerfile asserts
+            # CUDAExecutionProvider after installing onnxruntime-gpu (silent
+            # CPU inference otherwise), and no pip install may follow the
+            # assert, or it could replace onnxruntime behind it. awk skips
+            # comment lines (they legitimately mention "pip install").
+            if ! grep -q 'CUDAExecutionProvider' Dockerfile; then
+              echo "FAIL: Dockerfile has no CUDAExecutionProvider assertion (onnxruntime gate)"
+              exit 1
+            fi
+            if ! awk '/^[[:space:]]*#/ { next } /pip3? install/ { p = NR } /CUDAExecutionProvider/ { a = NR } END { exit (p > a) }' Dockerfile; then
+              echo "FAIL: Dockerfile runs pip install after the CUDAExecutionProvider assertion (ordering trap: a later install can swap onnxruntime out from under the assert)"
+              exit 1
+            fi
+            echo "OK: Dockerfile carries the CUDAExecutionProvider assertion, with no pip install after it"
+
+  validate_models:
+    executor: python
+    steps:
+      - checkout
+      - run:
+          name: Validate models via the shared runtime validator (pinned by pins.json)
+          command: python3 tools/validate_models.py
+
   build_and_push:
     executor: docker-dind
     steps:
       - checkout
-
       - run:
           name: Log in to Docker Hub
           command: |
@@ -57,16 +111,31 @@ jobs:
             IMG="docker.io/$DOCKERHUB_USER/comfyui-wan-template"
             CACHE_TAG="buildcache"
 
+            # pins.json owns the base image (consumed by CI as a build arg at
+            # vN tag time). Fail loudly rather than fall through to the
+            # Dockerfile's ARG default: a silent fallback would make a base
+            # bump in pins.json look applied while being ignored.
+            BASE_IMAGE=$(python3 -c "import json; print(json.load(open('pins.json')).get('base_image', ''))")
+            if [ -z "$BASE_IMAGE" ]; then
+              echo "FATAL: could not read base_image from pins.json (missing file or empty key)"
+              exit 1
+            fi
+            echo "Building FROM ${BASE_IMAGE}"
+
             # Seed BuildKit from the previous build's cache image, if any.
-            # Best-effort: first build (no prior cache) is a no-op miss.
+            # Best-effort: the first build (no prior cache) is a no-op miss.
             docker pull "${IMG}:${CACHE_TAG}" || true
 
+            # Single cu130 build. The -cuda13 sibling tag and its
+            # buildcache-cuda13 cache tag are dropped as of v26 (the base
+            # image is cu130-only); do not resurrect them here.
             # BUILDKIT_INLINE_CACHE=1 embeds layer metadata in the output
             # image so future --cache-from runs can read it.
             docker build \
               --progress=plain \
               --cache-from "${IMG}:${CACHE_TAG}" \
               --build-arg BUILDKIT_INLINE_CACHE=1 \
+              --build-arg BASE_IMAGE="${BASE_IMAGE}" \
               -t "${IMG}:${TAG}" .
 
             # Push the version tag (what users pull).
@@ -77,31 +146,10 @@ jobs:
             docker tag "${IMG}:${TAG}" "${IMG}:${CACHE_TAG}"
             docker push "${IMG}:${CACHE_TAG}"
 
-            # --- Experimental CUDA 13 + NVFP4 image: same git tag, -cuda13 suffix ---
-            # Same Dockerfile, four CUDA ARGs overridden. Own cache tag so it never
-            # thrashes the cu128 layer cache.
-            CUDA13_CACHE_TAG="buildcache-cuda13"
-            docker pull "${IMG}:${CUDA13_CACHE_TAG}" || true
-
-            docker build \
-              --progress=plain \
-              --cache-from "${IMG}:${CUDA13_CACHE_TAG}" \
-              --build-arg BUILDKIT_INLINE_CACHE=1 \
-              --build-arg CUDA_BASE_IMAGE=nvidia/cuda:13.0.3-cudnn-devel-ubuntu24.04 \
-              --build-arg TORCH_PACKAGES="torch==2.11.0 torchvision==0.26.0 torchaudio==2.11.0" \
-              --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu130 \
-              --build-arg CUDA_VARIANT=cu130 \
-              -t "${IMG}:${TAG}-cuda13" .
-
-            docker push "${IMG}:${TAG}-cuda13"
-
-            docker tag "${IMG}:${TAG}-cuda13" "${IMG}:${CUDA13_CACHE_TAG}"
-            docker push "${IMG}:${CUDA13_CACHE_TAG}"
-
             touch /tmp/build_success
 
       - run:
-          name: Notify FlowBot — build complete
+          name: Notify FlowBot - build complete
           when: always
           command: |
             TAG="${CIRCLE_TAG:-latest}"
@@ -122,13 +170,49 @@ jobs:
 workflows:
   version: 2
   build_on_tag:
+    # Skipped for the weekly scheduled pipeline, which exists only to run
+    # weekly_url_validation; pushes and tags are unaffected.
+    when:
+      not:
+        equal: [scheduled_pipeline, << pipeline.trigger_source >>]
     jobs:
+      # Both gates run on every branch push and on version tags (a tag-filtered
+      # job's dependencies must themselves run on tags): verify catches broken
+      # shell/python/JSON, validate_models catches dead registry URLs and
+      # workflow drift, before a build is ever attempted.
+      - verify:
+          filters:
+            tags:
+              only: /.*/
+      - validate_models:
+          filters:
+            tags:
+              only: /.*/
       - build_and_push:
+          requires:
+            - verify
+            - validate_models
           context:
             - docker-hub
             - flowbot-webhook-token
           filters:
             tags:
-              only: /^v[0-9]+(\.[0-9]+)*$/   # run on tags like v5 or v1.2.3
+              only: /^v[0-9]+(\.[0-9]+)*$/  # run on tags like v5 or v1.2.3
             branches:
               ignore: /.*/
+
+  # Weekly URL-rot canary, Mondays 06:00 UTC. validate_models only ever fires
+  # on a push here, so a registry URL that 404s upstream leaves CI green over
+  # a broken template until the next edit. This org ("Hearmemanai") is a
+  # standalone (non-VCS) CircleCI org: the in-config `triggers:` form silently
+  # never fires and POST /api/v2/project/:slug/schedule is rejected, so the
+  # schedule lives in a pipeline-definition trigger created once via
+  # POST /api/v2/projects/:project_uuid/pipeline-definitions/:definition_id/triggers
+  # (provider "schedule"). This workflow gates on that pipeline's
+  # trigger_source; build_on_tag gates on the negation, so the weekly run
+  # executes only validate_models and never touches Docker Hub.
+  weekly_url_validation:
+    when:
+      equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+    jobs:
+      - validate_models

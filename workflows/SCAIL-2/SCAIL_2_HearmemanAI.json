@@ -742,7 +742,7 @@
         }
       },
       "widgets_values": [
-        "Sydney01_LowNoise.safetensors",
+        "Your_Character_LoRA_Here.safetensors",
         0.85
       ],
       "color": "#323",
@@ -2136,7 +2136,7 @@
         }
       },
       "widgets_values": [
-        "Rachel01_wan2.2low_epoch80.safetensors",
+        "Your_Character_LoRA_Here.safetensors",
         0.7
       ],
       "color": "#323",
