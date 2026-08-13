@@ -4,6 +4,11 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  schedule:
+    # Weekly re-run against upstream rot: registry URLs can 404 without any
+    # push here, and push-only validation leaves CI green over a broken
+    # template. Mondays 06:00 UTC.
+    - cron: '0 6 * * 1'
 
 jobs:
   validate:
