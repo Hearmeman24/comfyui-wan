@@ -17,4 +17,5 @@ AGENTS.md
 CLAUDE.md
 CHANGELOG.md
 .history/
-./claude/hooks/*
+.claude/hooks/*
+__pycache__/

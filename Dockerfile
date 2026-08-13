@@ -1,116 +1,58 @@
-# Use multi-stage build with caching optimizations
+# syntax=docker/dockerfile:1
+# ============================================================================
+# comfyui-wan template image, built FROM the shared base
+# (hearmeman/comfyui-base, comfyui-runtime/base/Dockerfile).
 #
-# CUDA variant is parametrized. Defaults reproduce the proven CUDA 12.8 image
-# byte-for-byte; the cu130 tag overrides these four ARGs (see .circleci/config.yml):
-#   CUDA_BASE_IMAGE / TORCH_PACKAGES / TORCH_INDEX_URL / CUDA_VARIANT
-# cu130 is REQUIRED for native NVFP4 (cuBLAS 13.x FP4 matmul); on cu128 cuBLAS
-# returns NOT_SUPPORTED and ComfyUI falls back to fp16/fp8.
-ARG CUDA_BASE_IMAGE=nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
-FROM ${CUDA_BASE_IMAGE} AS base
-
-# Re-declare after FROM so the build stage can read them.
-# cu128 uses the STABLE torch channel (not nightly): the nightly trio rotates daily
-# and frequently skews (torch a day ahead of torchvision/torchaudio, which pin an
-# exact older torch -> ResolutionImpossible). Stable wheels are released together,
-# mutually coherent, and don't get garbage-collected — reproducible tag rebuilds.
-ARG TORCH_PACKAGES="torch torchvision torchaudio"
-ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cu128
-ARG CUDA_VARIANT=cu128
-ENV CUDA_VARIANT=${CUDA_VARIANT}
-
-# Consolidated environment variables
-ENV DEBIAN_FRONTEND=noninteractive \
-   PIP_PREFER_BINARY=1 \
-   PYTHONUNBUFFERED=1 \
-   CMAKE_BUILD_PARALLEL_LEVEL=8 \
-   HF_XET_HIGH_PERFORMANCE=1
-
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-        python3.12 python3.12-venv python3.12-dev \
-        python3-pip \
-        curl ffmpeg ninja-build git aria2 git-lfs wget vim \
-        libgl1 libglib2.0-0 build-essential gcc && \
-    \
-    # make Python3.12 the default python & pip
-    ln -sf /usr/bin/python3.12 /usr/bin/python && \
-    ln -sf /usr/bin/pip3 /usr/bin/pip && \
-    \
-    python3.12 -m venv /opt/venv && \
-    \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Use the virtual environment
-ENV PATH="/opt/venv/bin:$PATH"
-
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install ${TORCH_PACKAGES} \
-        --index-url ${TORCH_INDEX_URL}
-
-# Freeze the torch family so custom-node requirements.txt installs below cannot
-# upgrade/downgrade it (which on cu130 would silently drop NVFP4 support).
-RUN pip freeze | grep -E "^(torch|torchvision|torchaudio|torchsde)==" > /torch-constraint.txt
-
-# Core Python tooling
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install packaging setuptools wheel
-
-# Runtime libraries
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install pyyaml gdown triton jupyterlab jupyterlab-lsp \
-        jupyter-server jupyter-server-terminals \
-        ipykernel jupyterlab_code_formatter
-
-# huggingface_hub (provides `hf` CLI + bundled hf_xet accelerator)
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --upgrade huggingface_hub
-
-# ------------------------------------------------------------
-# ComfyUI install — direct clone + pip install. Replaces comfy-cli,
-# which used to clone the same repo and create a private .venv we then
-# deleted anyway. Simpler, fewer indirection layers, no ~7 GB .venv.
+# The base owns: python 3.12 + /opt/venv (on PATH), the pinned torch trio +
+# /torch-constraint.txt applied via ENV PIP_CONSTRAINT, pip tooling, pyyaml/
+# gdown/triton/jupyterlab, huggingface_hub + hf_xet, opencv-python, ComfyUI
+# pinned at COMFYUI_REF (v0.32.0) with /comfyui-approved-ref, ComfyUI-Manager,
+# both SageAttention wheels under /opt/sage/, the CivitAI downloader, and
+# ENV ORT_INDEX_ARGS (the per-CUDA-variant onnxruntime index nuance).
 #
-# The ADD below fetches the current master ref from the GitHub API on
-# every build; its content changes whenever ComfyUI master moves, which
-# invalidates the clone layer. Without it, docker_layer_caching would
-# keep serving the ComfyUI baked into the previous build's cache.
-# ------------------------------------------------------------
-ADD https://api.github.com/repos/comfyanonymous/ComfyUI/git/refs/heads/master /comfyui-master-ref.json
-RUN --mount=type=cache,target=/root/.cache/pip \
-    git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /ComfyUI \
-    && pip install -r /ComfyUI/requirements.txt
+# This layer adds ONLY the wan node set, the onnxruntime-gpu reassert, and
+# the entrypoint. BASE_IMAGE is passed by CI from pins.json's "base_image";
+# the default below mirrors that pin so a plain build stays coherent.
+# cu130 only: the cu128 default and the -cuda13 sibling variant are gone
+# (spec M-A), so the four CUDA override ARGs the old Dockerfile carried are
+# gone with them.
+# ============================================================================
+ARG BASE_IMAGE=hearmeman/comfyui-base:cu130-comfy0.32.0-torch2.11.0
+FROM ${BASE_IMAGE}
 
-FROM base AS final
-# Make sure to use the virtual environment here too
-ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install opencv-python
-
+# The wan node set, culled 2026-08-13 to the packs the 29 shipped workflows
+# actually resolve nodes from, plus the Tier 1 packs kept on every template
+# (rgthree-comfy for its UI layer; OpenRouter is boot-cloned via
+# template.json's custom_nodes.repos, spec D4, not baked here). Removed from
+# the old 30-pack loop, each verified unused by every workflow including
+# subgraph definitions (spec grounding section 7): UltimateSDUpscale,
+# Comfyroll, comfy-plasma, mikey_nodes, Florence2, LatentSyncWrapper,
+# TeaCache, Detail-Daemon, cg-image-picker.
+#
+# KJNodes and WanVideoWrapper are ALSO in template.json's custom_nodes.repos:
+# the runtime's clone loop finds the baked dir and takes its update branch,
+# so they keep tracking upstream at boot with no dual clone.
+#
+# No ADD cache-busters on any pack: none was present before and none of these
+# packs version-gates a model release, so pack HEADs freeze in the layer cache
+# until this loop line changes, the same deliberate family shape as before.
+# PIP_CONSTRAINT (base-owned) applies to every requirements install below.
 RUN for repo in \
-    https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git \
     https://github.com/kijai/ComfyUI-KJNodes.git \
     https://github.com/rgthree/rgthree-comfy.git \
     https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git \
-    https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git \
-    https://github.com/Jordach/comfy-plasma.git \
     https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git \
-    https://github.com/bash-j/mikey_nodes.git \
     https://github.com/ltdrdata/ComfyUI-Impact-Pack.git \
     https://github.com/Fannovel16/comfyui_controlnet_aux.git \
     https://github.com/yolain/ComfyUI-Easy-Use.git \
-    https://github.com/kijai/ComfyUI-Florence2.git \
-    https://github.com/ShmuelRonen/ComfyUI-LatentSyncWrapper.git \
     https://github.com/WASasquatch/was-node-suite-comfyui.git \
     https://github.com/theUpsider/ComfyUI-Logic.git \
     https://github.com/cubiq/ComfyUI_essentials.git \
-    https://github.com/chrisgoringe/cg-image-picker.git \
     https://github.com/chflame163/ComfyUI_LayerStyle.git \
     https://github.com/chrisgoringe/cg-use-everywhere.git \
     https://github.com/kijai/ComfyUI-segment-anything-2.git \
     https://github.com/ClownsharkBatwing/RES4LYF \
-    https://github.com/welltop-cn/ComfyUI-TeaCache.git \
     https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git \
-    https://github.com/Jonseed/ComfyUI-Detail-Daemon.git \
     https://github.com/kijai/ComfyUI-WanVideoWrapper.git \
     https://github.com/chflame163/ComfyUI_LayerStyle_Advance.git \
     https://github.com/BadCafeCode/masquerade-nodes-comfyui.git \
@@ -120,56 +62,33 @@ RUN for repo in \
     do \
         cd /ComfyUI/custom_nodes; \
         repo_dir=$(basename "$repo" .git); \
-        if [ "$repo" = "https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git" ]; then \
-            git clone --recursive "$repo"; \
-        else \
-            git clone "$repo"; \
-        fi; \
+        git clone "$repo"; \
         if [ -f "/ComfyUI/custom_nodes/$repo_dir/requirements.txt" ]; then \
-            pip install -r "/ComfyUI/custom_nodes/$repo_dir/requirements.txt" \
-                --constraint /torch-constraint.txt; \
+            pip install -r "/ComfyUI/custom_nodes/$repo_dir/requirements.txt"; \
         fi; \
         if [ -f "/ComfyUI/custom_nodes/$repo_dir/install.py" ]; then \
             python "/ComfyUI/custom_nodes/$repo_dir/install.py"; \
         fi; \
     done
 
-# Force GPU onnxruntime. Several custom node requirements.txt files
-# pull in plain `onnxruntime` (CPU) which shadows our GPU install
-# because both packages provide the same `onnxruntime` Python module —
-# last install wins. Reinstalling after the clone loop guarantees the
-# image ships with the CUDA provider available.
+# Force GPU onnxruntime. A node requirements file can pull in plain
+# `onnxruntime` (CPU), which shadows the GPU install because both provide the
+# same `onnxruntime` module and last install wins. This reassert therefore
+# comes AFTER the clone loop, and no later RUN may pip install anything
+# (comfyui-runtime base Dockerfile, onnxruntime ordering trap). ORT_INDEX_ARGS
+# is base-owned data: the Azure onnxruntime-cuda-12 index on cu128, empty on
+# cu130 where PyPI's onnxruntime-gpu links CUDA 13.
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip uninstall -y onnxruntime onnxruntime-gpu 2>/dev/null || true; \
-    pip install onnxruntime-gpu
+    pip install onnxruntime-gpu $ORT_INDEX_ARGS
 
-# ComfyUI-Manager. Cloned as lowercase `comfyui-manager` so it loads
-# after the other custom_nodes (ComfyUI loads alphabetically — capital
-# letters first), which is required for Manager to detect IMPORT FAILED
-# states in earlier-loaded nodes.
-RUN --mount=type=cache,target=/root/.cache/pip \
-    git clone --depth=1 https://github.com/ltdrdata/ComfyUI-Manager.git \
-        /ComfyUI/custom_nodes/comfyui-manager \
-    && if [ -f /ComfyUI/custom_nodes/comfyui-manager/requirements.txt ]; then \
-         pip install -r /ComfyUI/custom_nodes/comfyui-manager/requirements.txt; \
-       fi
-
-# Bake the prebuilt SageAttention cu130 wheel. start.sh installs it at runtime ONLY
-# on the cu130 variant (and only if a real kernel probe passes on the worker GPU);
-# the cu128 image carries the file but never uses it (the wheel links libcudart.so.13
-# and won't import on cu128). cp312 wheel matches this image's python3.12.
-COPY sageattention-2.2.0-cp312-cp312-linux_x86_64.whl /opt/sage/
-
-# cu130 build-time sanity check: fail fast if torch isn't CUDA 13 or sage can't load.
-# No-op on the cu128 default build.
-RUN if [ "$CUDA_VARIANT" = "cu130" ]; then \
-        python3 -c "import torch; assert torch.version.cuda.startswith('13'), torch.version.cuda; print('torch', torch.__version__)" && \
-        pip install --no-deps /opt/sage/sageattention-2.2.0-cp312-cp312-linux_x86_64.whl && \
-        python3 -c "import sageattention; print('sageattention import OK')"; \
-    fi
+# Build-time gate: the shipped image must expose the CUDA provider. Provider
+# enumeration is import-only and works with no GPU present, so this fails the
+# CI build, not a customer pod. CI greps this Dockerfile for the
+# CUDAExecutionProvider assertion and for the no-pip-install-after-it rule.
+RUN python3 -c "import onnxruntime; p = onnxruntime.get_available_providers(); assert 'CUDAExecutionProvider' in p, p; print('onnxruntime providers OK:', p)"
 
 COPY src/start_script.sh /start_script.sh
 RUN chmod +x /start_script.sh
-COPY 4xLSDIR.pth /4xLSDIR.pth
 
 CMD ["/start_script.sh"]
