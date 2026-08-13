@@ -156,5 +156,10 @@
   "yolov10m.onnx": {
     "url": "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B/resolve/main/process_checkpoint/det/yolov10m.onnx",
     "subdir": "detection"
+  },
+  "rife426.pth": {
+    "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/frame_interpolation/rife426.pth",
+    "subdir": "frame_interpolation",
+    "upstream_url": "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation/releases/download/models/rife426.pth"
   }
 }

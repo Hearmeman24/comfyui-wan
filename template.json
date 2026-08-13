@@ -7,12 +7,18 @@
       "folders": [
         "Wan 2.1",
         "Infinite Talk"
+      ],
+      "extra_models": [
+        "rife426.pth"
       ]
     },
     "download_wan22": {
       "folders": [
         "Wan 2.2",
         "SVI_Video_Extension_Wan2.2"
+      ],
+      "extra_models": [
+        "rife426.pth"
       ]
     },
     "download_wan_animate": {
@@ -20,17 +26,24 @@
         "Wan Animate"
       ],
       "extra_models": [
-        "1x-ITF-SkinDiffDetail-Lite-v1.pth"
+        "1x-ITF-SkinDiffDetail-Lite-v1.pth",
+        "rife426.pth"
       ]
     },
     "download_steady_dancer": {
       "folders": [
         "Steady Dancer"
+      ],
+      "extra_models": [
+        "rife426.pth"
       ]
     },
     "DOWNLOAD_SCAIL2": {
       "folders": [
         "SCAIL-2"
+      ],
+      "extra_models": [
+        "rife426.pth"
       ]
     }
   },
