@@ -5,8 +5,7 @@
   "flags": {
     "download_wan21": {
       "folders": [
-        "Wan 2.1",
-        "Infinite Talk"
+        "Wan 2.1"
       ],
       "extra_models": [
         "rife426.pth"
@@ -14,8 +13,7 @@
     },
     "download_wan22": {
       "folders": [
-        "Wan 2.2",
-        "SVI_Video_Extension_Wan2.2"
+        "Wan 2.2"
       ],
       "extra_models": [
         "rife426.pth"
@@ -62,13 +60,8 @@
     "repos": [
       "https://github.com/kijai/ComfyUI-WanVideoWrapper.git",
       "https://github.com/kijai/ComfyUI-KJNodes.git|204f6d5",
-      "https://github.com/wildminder/ComfyUI-VibeVoice.git",
       "https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git",
-      "https://github.com/obisin/ComfyUI-FSampler.git",
-      "https://github.com/cmeka/ComfyUI-WanMoEScheduler.git",
-      "https://github.com/lrzjason/ComfyUI-VAE-Utils.git",
-      "https://github.com/wallen0322/ComfyUI-Wan22FMLF.git",
-      "https://github.com/gabe-init/ComfyUI-Openrouter_node.git"
+      "https://github.com/cmeka/ComfyUI-WanMoEScheduler.git"
     ]
   },
   "sage": true
