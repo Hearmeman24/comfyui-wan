@@ -20,23 +20,39 @@
 ARG BASE_IMAGE=hearmeman/comfyui-base:cu130-comfy0.32.0-torch2.11.0
 FROM ${BASE_IMAGE}
 
-# The wan node set, culled 2026-08-13 to the packs the 29 shipped workflows
+# The wan node set, culled 2026-08-13 to the packs the shipped workflows
 # actually resolve nodes from, plus the Tier 1 packs kept on every template
-# (rgthree-comfy for its UI layer; OpenRouter is boot-cloned via
-# template.json's custom_nodes.repos, spec D4, not baked here). Removed from
-# the old 30-pack loop, each verified unused by every workflow including
-# subgraph definitions (spec grounding section 7): UltimateSDUpscale,
-# Comfyroll, comfy-plasma, mikey_nodes, Florence2, LatentSyncWrapper,
-# TeaCache, Detail-Daemon, cg-image-picker.
+# (rgthree-comfy for its UI layer). Removed from the old 30-pack loop, each
+# verified unused by every workflow including subgraph definitions (spec
+# grounding section 7): UltimateSDUpscale, Comfyroll, comfy-plasma,
+# mikey_nodes, Florence2, LatentSyncWrapper, TeaCache, Detail-Daemon,
+# cg-image-picker.
 #
-# KJNodes and WanVideoWrapper are ALSO in template.json's custom_nodes.repos:
-# the runtime's clone loop finds the baked dir and takes its update branch,
-# so they keep tracking upstream at boot with no dual clone.
+# EVERY pack is baked here as of 2026-08-14. template.json's
+# custom_nodes.repos is now empty and the runtime's clone loop is a no-op for
+# wan, so a boot performs no network fetch for nodes at all. The three that
+# used to be boot-cloned under spec D4 (WanAnimatePreprocess, WanMoEScheduler,
+# Openrouter_node) are in the loop below; Aviv's call, 2026-08-14: "these no
+# longer move". The tradeoff that buys: no upstream fix reaches a pod without
+# a rebuild and a new vN tag, and in exchange a boot cannot lose a node pack
+# to GitHub being unreachable.
 #
-# No ADD cache-busters on any pack: none was present before and none of these
-# packs version-gates a model release, so pack HEADs freeze in the layer cache
-# until this loop line changes, the same deliberate family shape as before.
+# Nothing is pinned. KJNodes used to be held at 204f6d5 (2026-01-05) by the
+# runtime clone loop; Aviv dropped that pin on 2026-08-14, so the image takes
+# whatever kijai's main resolves to at build time.
+#
+# The ADD below is what makes "latest" true on more than the first build. CI
+# runs with docker_layer_caching and --cache-from and never --no-cache
+# (.circleci/config.yml:10,136), so an unchanged RUN line serves its cached
+# layer forever and a rebuild would silently reship the KJNodes commit the
+# FIRST build happened to resolve. The ADD re-reads the GitHub API every
+# build, so the layer invalidates whenever kijai's main moves (CLAUDE.md
+# section 8). All 24 clones live in the one RUN below, so that invalidation
+# re-resolves every pack, not only KJNodes. That is the intended shape here:
+# with the boot-time clone loop gone, a rebuild is now the only way any pack
+# moves at all.
 # PIP_CONSTRAINT (base-owned) applies to every requirements install below.
+ADD https://api.github.com/repos/kijai/ComfyUI-KJNodes/git/refs/heads/main /pack-refs/ComfyUI-KJNodes.json
 RUN for repo in \
     https://github.com/kijai/ComfyUI-KJNodes.git \
     https://github.com/rgthree/rgthree-comfy.git \
@@ -58,7 +74,10 @@ RUN for repo in \
     https://github.com/BadCafeCode/masquerade-nodes-comfyui.git \
     https://github.com/1038lab/ComfyUI-RMBG.git \
     https://github.com/M1kep/ComfyLiterals.git \
-    https://github.com/city96/ComfyUI-GGUF.git; \
+    https://github.com/city96/ComfyUI-GGUF.git \
+    https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git \
+    https://github.com/cmeka/ComfyUI-WanMoEScheduler.git \
+    https://github.com/gabe-init/ComfyUI-Openrouter_node.git; \
     do \
         cd /ComfyUI/custom_nodes; \
         repo_dir=$(basename "$repo" .git); \
