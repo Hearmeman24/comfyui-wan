@@ -12,8 +12,8 @@ models shared between sets are only downloaded once.
 
 | Variable | What you get |
 |---|---|
-| download_wan21 | Wan 2.1: text to video, image to video, VACE, Self Forcing, plus Infinite Talk (talking video from audio). About 97 GB. |
-| download_wan22 | Wan 2.2: text to video, image to video, image generation, 60 FPS, SVI video extension. About 174 GB. |
+| download_wan21 | Wan 2.1: text to video, image to video, plus Infinite Talk (talking video from audio). About 87 GB. |
+| download_wan22 | Wan 2.2: text to video, image to video, image generation, 60 FPS, SVI video extension. About 163 GB. |
 | download_wan_animate | Wan Animate: transfer motion and expressions from a video onto a character, or replace a person in a video. About 48 GB. |
 | download_steady_dancer | Steady Dancer: dance videos driven by a reference video. About 49 GB. |
 | DOWNLOAD_SCAIL2 | SCAIL-2 video generation. About 28 GB. Note this variable is uppercase. |

@@ -28,7 +28,7 @@ FYI: this template is built for CUDA 13.0 and above.
 
 | Variable | Default | What it does |
 |---|---|---|
-| `download_wan21` | false | Wan 2.1 including VACE, plus Infinite Talk, with their workflows and models |
+| `download_wan21` | false | Wan 2.1 text to video and image to video, plus Infinite Talk, with their workflows and models |
 | `download_wan22` | false | Wan 2.2 and SVI Video Extension, with their workflows and models |
 | `download_wan_animate` | false | Wan Animate workflows and models |
 | `download_steady_dancer` | false | Steady Dancer workflow and models |
