@@ -18,12 +18,11 @@ models shared between sets are only downloaded once.
 | download_steady_dancer | Steady Dancer: dance videos driven by a reference video. About 49 GB. |
 | DOWNLOAD_SCAIL2 | SCAIL-2 video generation. About 28 GB. Note this variable is uppercase. |
 
-## This version needs a CUDA 13 host
+## CUDA
 
-This is a change you need to act on. The image is now built on CUDA 13.
-When you deploy, open Additional Filters and set CUDA Version to 13.0
-or higher. On an older host ComfyUI will not start. Earlier versions of
-this template asked for CUDA 12.8; that filter no longer works here.
+FYI: this template is built for CUDA 13.0 and above. There is nothing
+for you to do about it. The template is scoped to that, so RunPod only
+offers it to you on a host that supports it.
 
 ## Your own LoRAs
 
