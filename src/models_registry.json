@@ -4,12 +4,6 @@
     "subdir": "upscale_models",
     "upstream_url": "https://objectstorage.us-phoenix-1.oraclecloud.com/n/ax6ygfvpvzka/b/open-modeldb-files/o/1x-ITF-SkinDiffDetail-Lite-v1.pth"
   },
-  "2xLiveActionV1_SPAN_490000.pth": {
-    "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/upscale_models/2xLiveActionV1_SPAN_490000.pth",
-    "subdir": "upscale_models",
-    "min_size_mb": 5,
-    "upstream_url": "https://raw.githubusercontent.com/jcj83429/upscaling/f73a3a02874360ec6ced18f8bdd8e43b5d7bba57/2xLiveActionV1_SPAN/2xLiveActionV1_SPAN_490000.pth"
-  },
   "4x-ClearRealityV1_Soft.pth": {
     "url": "https://huggingface.co/Kim2091/ClearRealityV1/resolve/main/4x-ClearRealityV1_Soft.pth",
     "subdir": "upscale_models",
@@ -35,14 +29,6 @@
     "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/SteadyDancer/Wan21_I2V_SteadyDancer_fp16.safetensors",
     "subdir": "diffusion_models"
   },
-  "Wan21_T2V_14B_lightx2v_cfg_step_distill_lora_rank32.safetensors": {
-    "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan21_T2V_14B_lightx2v_cfg_step_distill_lora_rank32.safetensors",
-    "subdir": "loras"
-  },
-  "Wan2_1-InfiniTetalk-Single_fp16.safetensors": {
-    "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/InfiniteTalk/Wan2_1-InfiniTetalk-Single_fp16.safetensors",
-    "subdir": "diffusion_models"
-  },
   "Wan2_1_VAE_bf16.safetensors": {
     "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1_VAE_bf16.safetensors",
     "subdir": "vae"
@@ -57,10 +43,6 @@
   },
   "i2v_lightx2v_low_noise_model.safetensors": {
     "url": "https://huggingface.co/lightx2v/Wan2.2-Distill-Loras/resolve/main/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors",
-    "subdir": "loras"
-  },
-  "lightx2v_I2V_14B_480p_cfg_step_distill_rank128_bf16.safetensors": {
-    "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank128_bf16.safetensors",
     "subdir": "loras"
   },
   "lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors": {
@@ -141,5 +123,13 @@
     "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/frame_interpolation/rife426.pth",
     "subdir": "frame_interpolation",
     "upstream_url": "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation/releases/download/models/rife426.pth"
+  },
+  "wan2.2_t2v_A14b_high_noise_lora_rank64_lightx2v_4step_1217.safetensors": {
+    "url": "https://huggingface.co/lightx2v/Wan2.2-Distill-Loras/resolve/main/wan2.2_t2v_A14b_high_noise_lora_rank64_lightx2v_4step_1217.safetensors",
+    "subdir": "loras"
+  },
+  "wan2.2_t2v_A14b_low_noise_lora_rank64_lightx2v_4step_1217.safetensors": {
+    "url": "https://huggingface.co/lightx2v/Wan2.2-Distill-Loras/resolve/main/wan2.2_t2v_A14b_low_noise_lora_rank64_lightx2v_4step_1217.safetensors",
+    "subdir": "loras"
   }
 }

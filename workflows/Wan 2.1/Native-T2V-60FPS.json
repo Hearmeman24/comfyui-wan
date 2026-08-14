@@ -1134,62 +1134,8 @@
         },
         {
           "on": false,
-          "lora": "I2V-tittydrop-e26.safetensors",
+          "lora": "Your_Character_LoRA_Here.safetensors",
           "strength": 1,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "P004-Lying-Bouncing-i2v-v10-000010.safetensors",
-          "strength": 1,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "deepthroat_epoch_80.safetensors",
-          "strength": 0.7999999999999997,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "detailz-wan.safetensors",
-          "strength": 1,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "dicks_epoch_100.safetensors",
-          "strength": 1,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "doggyPOV_v1_1.safetensors",
-          "strength": 1,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "erect_penis_epoch_80.safetensors",
-          "strength": 0.6,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "wan_female_masturbation.safetensors",
-          "strength": 1,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "wan_pov_blowjob.safetensors",
-          "strength": 1,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "woman_undressing_v1.0_wan14b_epoch048.safetensors",
-          "strength": 0.9,
           "strengthTwo": null
         },
         {},

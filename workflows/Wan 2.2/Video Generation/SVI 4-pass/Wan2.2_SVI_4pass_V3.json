@@ -3788,8 +3788,8 @@
           "type": "PowerLoraLoaderHeaderWidget"
         },
         {
-          "on": true,
-          "lora": "DR34ML4Y_I2V_14B_HIGH_V2.safetensors",
+          "on": false,
+          "lora": "Your_LoRA_Here_HIGH_NOISE.safetensors",
           "strength": 1,
           "strengthTwo": null
         },
@@ -3863,8 +3863,8 @@
           "type": "PowerLoraLoaderHeaderWidget"
         },
         {
-          "on": true,
-          "lora": "DR34ML4Y_I2V_14B_LOW_V2.safetensors",
+          "on": false,
+          "lora": "Your_LoRA_Here_LOW_NOISE.safetensors",
           "strength": 0.7,
           "strengthTwo": null
         },
@@ -4833,8 +4833,8 @@
           "type": "PowerLoraLoaderHeaderWidget"
         },
         {
-          "on": true,
-          "lora": "DR34ML4Y_I2V_14B_HIGH_V2.safetensors",
+          "on": false,
+          "lora": "Your_LoRA_Here_HIGH_NOISE.safetensors",
           "strength": 0.8,
           "strengthTwo": null
         },
@@ -4908,8 +4908,8 @@
           "type": "PowerLoraLoaderHeaderWidget"
         },
         {
-          "on": true,
-          "lora": "DR34ML4Y_I2V_14B_LOW_V2.safetensors",
+          "on": false,
+          "lora": "Your_LoRA_Here_LOW_NOISE.safetensors",
           "strength": 0.8,
           "strengthTwo": null
         },
@@ -4983,14 +4983,14 @@
           "type": "PowerLoraLoaderHeaderWidget"
         },
         {
-          "on": true,
-          "lora": "DR34ML4Y_I2V_14B_HIGH_V2.safetensors",
+          "on": false,
+          "lora": "Your_LoRA_Here_HIGH_NOISE.safetensors",
           "strength": 0.75,
           "strengthTwo": null
         },
         {
           "on": false,
-          "lora": "smash_cut_wan_high_250.safetensors",
+          "lora": "Your_Character_LoRA_Here.safetensors",
           "strength": 1,
           "strengthTwo": null
         },
@@ -5064,8 +5064,8 @@
           "type": "PowerLoraLoaderHeaderWidget"
         },
         {
-          "on": true,
-          "lora": "DR34ML4Y_I2V_14B_LOW_V2.safetensors",
+          "on": false,
+          "lora": "Your_LoRA_Here_LOW_NOISE.safetensors",
           "strength": 0.78,
           "strengthTwo": null
         },
@@ -5139,14 +5139,14 @@
           "type": "PowerLoraLoaderHeaderWidget"
         },
         {
-          "on": true,
-          "lora": "DR34ML4Y_I2V_14B_HIGH_V2.safetensors",
+          "on": false,
+          "lora": "Your_LoRA_Here_HIGH_NOISE.safetensors",
           "strength": 0.75,
           "strengthTwo": null
         },
         {
           "on": false,
-          "lora": "smash_cut_wan_high_250.safetensors",
+          "lora": "Your_Character_LoRA_Here.safetensors",
           "strength": 1,
           "strengthTwo": null
         },
@@ -5220,8 +5220,8 @@
           "type": "PowerLoraLoaderHeaderWidget"
         },
         {
-          "on": true,
-          "lora": "DR34ML4Y_I2V_14B_LOW_V2.safetensors",
+          "on": false,
+          "lora": "Your_LoRA_Here_LOW_NOISE.safetensors",
           "strength": 0.85,
           "strengthTwo": null
         },

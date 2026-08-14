@@ -1573,7 +1573,7 @@
         }
       },
       "widgets_values": [
-        "dslr_video_00003.safetensors",
+        "Your_Character_LoRA_Here.safetensors",
         0.8000000000000002
       ],
       "color": "#223",
@@ -1621,7 +1621,7 @@
         }
       },
       "widgets_values": [
-        "Wan2.2 - T2V - Insta Girls LOW - 14B.safetensors",
+        "Your_Character_LoRA_Here.safetensors",
         0.9000000000000001
       ],
       "color": "#223",
@@ -1669,7 +1669,7 @@
         }
       },
       "widgets_values": [
-        "Wan2.2 - T2V - Insta Girls HIGH - 14B.safetensors",
+        "Your_Character_LoRA_Here.safetensors",
         0.9000000000000001
       ],
       "color": "#223",

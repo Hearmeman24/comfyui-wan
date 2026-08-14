@@ -1748,7 +1748,7 @@
         },
         {
           "on": false,
-          "lora": "Wan_Breast_Helper_Hearmeman.safetensors",
+          "lora": "Your_Character_LoRA_Here.safetensors",
           "strength": 1,
           "strengthTwo": null
         },
