@@ -1,97 +1,55 @@
-# Created by HearmemanAI https://www.hearmemanai.com
+# Wan 2.1 and 2.2 video generation, ComfyUI on RunPod
 
-[![Sponsor](https://readme.cash/i/pift670zt5.svg)](https://readme.cash/c/pift670zt5)
+Created by HearmemanAI. Something not working, or a question about a workflow? Ask in
+help-and-support on [my Discord](https://discord.gg/ZVWVhT43GW). That is the only place I do
+support, and it is also where new releases are announced.
 
-# Troubleshooting guide in case you encounter any errors:
-[click here](https://docs.google.com/document/d/1822H-x7AevWz2T_jzMu8-9e5UlQ-zrH0FhCFmQ6FtRc/edit?usp=sharing)
----
-# v12 — Major Refactor (May 2026)
-> ⚠️ **Breaking change for existing users.**
-> The old per-resolution / per-feature flags are gone. If you're updating an existing pod template, **delete** the removed env vars below and **add** the new ones — otherwise nothing will download.
+## Before you deploy
 
-> ⚠️ **CUDA 13.0+ required.** Before deploying, open Additional Filters and select CUDA 13.0 or higher. The image is built on CUDA 13; it will not run on a CUDA 12.8 host.
-> Fallback (older CUDA): https://runpod.io/console/deploy?template=0b7tk92912&ref=uyjfcrgy
+Set all of this on the template before you click Deploy, not after.
 
----
+Click Edit Template and open the environment variables tab. Set at least one download flag to
+true. They are all off by default. A pod with no flag set boots a working but empty ComfyUI, so the
+workflows open with blank loader dropdowns and look broken. The full list is in the next section.
 
-## What's new in v12
-- **Workflow-driven downloads.** The pod now reads the workflows you choose and downloads only the models those workflows actually reference. No more redundant multi-gigabyte downloads.
-- **Faster HF transfers.** Hugging Face's `hf_xet` accelerator is enabled image-wide (`HF_XET_HIGH_PERFORMANCE=1`), typically 1.5–3× faster than aria2 on HF.
-- **Live download manager.** A 3-way pool with an append-only status snapshot every 10s (active %, speed, ETA; queued list; done count). No more interleaved aria2 spam.
-- **Faster boot.** `comfy-aimdo` / `comfy-kitchen` now install in the background instead of blocking startup; redundant apt/pip steps removed.
-- **Slimmer workflow set.** Obsolete Wan-Fun-SDXL helper, legacy VACE preview, and the unused Video Extend workflow have been removed.
+If you want your own CivitAI LoRAs or checkpoints on the pod, set `civitai_token` and the ID
+variables below. The steps are
+[written up on my Discord](https://discord.com/channels/1359855405613715495/1536707221788950708),
+and in
+[this article](https://civitai.red/articles/12333/how-to-use-hearmemans-civitai-downloader-when-deploying-a-runpod-template).
 
----
+Then deploy. The first boot takes 5 to 20 minutes depending on which flags you set. ComfyUI comes
+up while the models are still downloading, so you can look around before it finishes. Later deploys
+on the same network volume are much faster.
 
-## CUDA 13
+FYI: this template is built for CUDA 13.0 and above.
 
-The image is CUDA 13 only. There is no separate `-cuda13` tag any more; the standard `:vN` tag
-is the CUDA 13 image. PyTorch is cu130, so **NVFP4** quants load natively on **Blackwell GPUs**
-(RTX 50xx / sm_120); on other GPUs NVFP4 degrades to fp16/fp8. SageAttention ships as a
-prebuilt wheel and is used automatically when your GPU supports it.
+## Environment variables
 
----
+| Variable | Default | What it does |
+|---|---|---|
+| `download_wan21` | false | Wan 2.1 including VACE, plus Infinite Talk, with their workflows and models |
+| `download_wan22` | false | Wan 2.2 and SVI Video Extension, with their workflows and models |
+| `download_wan_animate` | false | Wan Animate workflows and models |
+| `download_steady_dancer` | false | Steady Dancer workflow and models |
+| `DOWNLOAD_SCAIL2` | false | SCAIL-2 workflow and models. Note the uppercase. |
+| `civitai_token` | empty | Your CivitAI API token |
+| `CIVITAI_LORAS` | empty | Comma-separated CivitAI version IDs. They go to `models/loras`. |
+| `CIVITAI_CHECKPOINTS` | empty | Comma-separated CivitAI version IDs. They go to `models/checkpoints`. |
+| `HF_TOKEN` | empty | Optional. Raises your Hugging Face rate limit, which makes a first boot less likely to stall. |
 
-## ⚙️ Environment Variables
+Turn on as many download flags as you want. A model that two of them share is only downloaded once.
+Only the workflows belonging to the flags you enabled are installed, so the menu shows you what your
+models can actually run.
 
-Set the flags you want to **`true`** (lowercase, as strings). Multiple may be enabled at once — shared models are deduplicated automatically.
+## Once it is up
 
-### Download flags (new in v12)
+Click Connect, then open port 8188 for ComfyUI or port 8888 for JupyterLab. The boot log is at
+`/workspace/comfyui.log`.
 
-| Variable | Downloads + provisions |
-|---|---|
-| `download_wan21` | Wan 2.1 (incl. VACE) + Infinite Talk workflows + their models |
-| `download_wan22` | Wan 2.2 + SVI Video Extension workflows + their models |
-| `download_wan_animate` | Wan Animate workflows + models |
-| `download_steady_dancer` | Steady Dancer workflow + models |
-| `DOWNLOAD_SCAIL2` | SCAIL-2 workflow + models (note: uppercase) |
+Open the Workflows tab in ComfyUI. Every workflow carries notes in the graph telling you what it
+does and which settings matter, which is a better place to read than this page. The pod also writes
+three notes into the top of that same list on first boot: Welcome, Adding Models, and
+Troubleshooting.
 
-Only the workflows for enabled flags are copied into your ComfyUI workflows folder — you'll see exactly what your models can run.
-
-### Removed in v12 (delete these from your template if you're upgrading)
-`download_480p_native_models`, `download_720p_native_models`, `download_wan_fun_and_sdxl_helper`, `download_vace`, `download_vace_debug`, `download_wan_animate_only`, `debug_models`
-
-### CivitAI (unchanged)
-
-| Variable | Description |
-|---|---|
-| `civitai_token` | Your CivitAI token (auto-download LoRAs and Checkpoints) |
-| `LORAS_IDS_TO_DOWNLOAD` | Comma-separated CivitAI LoRA version IDs |
-| `CHECKPOINT_IDS_TO_DOWNLOAD` | Comma-separated CivitAI Checkpoint version IDs |
-
-👉 [CivitAI Downloader README](https://github.com/Hearmeman24/CivitAI_Downloader/blob/main/README.md)
-
----
-
-## 🚀 Deploying
-
-1. Set your env vars (at least one `download_*` flag set to `"true"`).
-2. Click **Deploy**.
-3. Wait for setup (5–20 minutes depending on flags + network).
-4. Future deployments are faster on a persistent network volume.
-
-## 🌐 Accessing ComfyUI
-1. Click **Connect**
-2. Open **port 8188**
-
-## 📓 Accessing JupyterLab
-1. Click **Connect**
-2. Open **port 8888**
-
----
-
-## 🛠️ Troubleshooting
-
-### Fixing Missing Custom Nodes
-If you see `IMPORT FAILED` in ComfyUI:
-1. Open the **Manager** menu
-2. Click **Install missing custom nodes**
-3. Click **Try fix**
-
-### User-supplied LoRAs
-If a workflow references a LoRA that isn't bundled (your personal training LoRAs, NSFW pack, etc.), the boot log will list them as "user-supplied". Drop them into `/workspace/ComfyUI/models/loras/` manually or via `LORAS_IDS_TO_DOWNLOAD`.
-
-> ℹ️ **For my other templates**:
-> [Click HERE](https://docs.google.com/spreadsheets/d/1NfbfZLzE9GIAD5B_y6xjK1IdW95c14oS1JuIG9QihL8/edit?usp=sharing)
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W81FM4M1)
+[My other templates](https://docs.google.com/spreadsheets/d/1NfbfZLzE9GIAD5B_y6xjK1IdW95c14oS1JuIG9QihL8/edit)
