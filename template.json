@@ -61,7 +61,8 @@
       "https://github.com/kijai/ComfyUI-WanVideoWrapper.git",
       "https://github.com/kijai/ComfyUI-KJNodes.git|204f6d5",
       "https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git",
-      "https://github.com/cmeka/ComfyUI-WanMoEScheduler.git"
+      "https://github.com/cmeka/ComfyUI-WanMoEScheduler.git",
+      "https://github.com/gabe-init/ComfyUI-Openrouter_node.git"
     ]
   },
   "sage": true
