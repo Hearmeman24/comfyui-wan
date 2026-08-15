@@ -9,6 +9,11 @@
     "subdir": "upscale_models",
     "min_size_mb": 5
   },
+  "2xLiveActionV1_SPAN_490000.pth": {
+    "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/upscale_models/2xLiveActionV1_SPAN_490000.pth",
+    "subdir": "upscale_models",
+    "min_size_mb": 5
+  },
   "4xLSDIR.pth": {
     "url": "https://huggingface.co/Hearmeman/comfyui-template-assets/resolve/main/upscale_models/4xLSDIR.pth",
     "subdir": "upscale_models"
