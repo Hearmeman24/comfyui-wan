@@ -9,7 +9,8 @@
       ],
       "extra_models": [
         "2xLiveActionV1_SPAN_490000.pth",
-        "rife426.pth"
+        "rife426.pth",
+        "taew2_1.pth"
       ]
     },
     "download_wan22": {
@@ -18,7 +19,8 @@
       ],
       "extra_models": [
         "2xLiveActionV1_SPAN_490000.pth",
-        "rife426.pth"
+        "rife426.pth",
+        "taew2_1.pth"
       ]
     },
     "download_wan_animate": {
@@ -28,7 +30,8 @@
       "extra_models": [
         "1x-ITF-SkinDiffDetail-Lite-v1.pth",
         "2xLiveActionV1_SPAN_490000.pth",
-        "rife426.pth"
+        "rife426.pth",
+        "taew2_1.pth"
       ]
     },
     "download_steady_dancer": {
@@ -37,7 +40,8 @@
       ],
       "extra_models": [
         "2xLiveActionV1_SPAN_490000.pth",
-        "rife426.pth"
+        "rife426.pth",
+        "taew2_1.pth"
       ]
     },
     "DOWNLOAD_SCAIL2": {
@@ -46,7 +50,8 @@
       ],
       "extra_models": [
         "2xLiveActionV1_SPAN_490000.pth",
-        "rife426.pth"
+        "rife426.pth",
+        "taew2_1.pth"
       ]
     }
   },
