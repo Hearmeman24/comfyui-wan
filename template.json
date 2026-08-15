@@ -51,7 +51,8 @@
       "extra_models": [
         "2xLiveActionV1_SPAN_490000.pth",
         "rife426.pth",
-        "taew2_1.pth"
+        "taew2_1.pth",
+        "wan2.1_SCAIL_2_DPO_lora_bf16.safetensors"
       ]
     }
   },
