@@ -62,7 +62,9 @@
   "models_symlink": false,
   "custom_nodes": {
     "target": "image",
-    "repos": []
+    "repos": [
+      "https://github.com/Hearmeman24/ComfyUI-HearmemanAI-Upscale.git"
+    ]
   },
   "sage": true
 }

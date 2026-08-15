@@ -299,7 +299,7 @@
         }
       },
       "widgets_values": [
-        "wan2.2_animate_14B_bf16.safetensors",
+        "wan2.2_animate_14B_int8_convrot.safetensors",
         "default"
       ],
       "color": "#223",
