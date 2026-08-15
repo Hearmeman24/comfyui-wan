@@ -96,8 +96,8 @@
     "url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_t2v_14B_bf16.safetensors",
     "subdir": "diffusion_models"
   },
-  "wan2.2_animate_14B_bf16.safetensors": {
-    "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_animate_14B_bf16.safetensors",
+  "wan2.2_animate_14B_int8_convrot.safetensors": {
+    "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_animate_14B_int8_convrot.safetensors",
     "subdir": "diffusion_models"
   },
   "wan2.2_animate_14B_relight_lora_bf16.safetensors": {
