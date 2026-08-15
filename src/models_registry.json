@@ -26,6 +26,10 @@
     "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors",
     "subdir": "loras"
   },
+  "taew2_1.pth": {
+    "url": "https://raw.githubusercontent.com/madebyollin/taehv/main/taew2_1.pth",
+    "subdir": "vae_approx"
+  },
   "Wan21_CausVid_14B_T2V_lora_rank32.safetensors": {
     "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan21_CausVid_14B_T2V_lora_rank32.safetensors",
     "subdir": "loras"
