@@ -8,6 +8,7 @@
         "Wan 2.1"
       ],
       "extra_models": [
+        "2xLiveActionV1_SPAN_490000.pth",
         "rife426.pth"
       ]
     },
@@ -16,6 +17,7 @@
         "Wan 2.2"
       ],
       "extra_models": [
+        "2xLiveActionV1_SPAN_490000.pth",
         "rife426.pth"
       ]
     },
@@ -25,6 +27,7 @@
       ],
       "extra_models": [
         "1x-ITF-SkinDiffDetail-Lite-v1.pth",
+        "2xLiveActionV1_SPAN_490000.pth",
         "rife426.pth"
       ]
     },
@@ -33,6 +36,7 @@
         "Steady Dancer"
       ],
       "extra_models": [
+        "2xLiveActionV1_SPAN_490000.pth",
         "rife426.pth"
       ]
     },
@@ -41,6 +45,7 @@
         "SCAIL-2"
       ],
       "extra_models": [
+        "2xLiveActionV1_SPAN_490000.pth",
         "rife426.pth"
       ]
     }
