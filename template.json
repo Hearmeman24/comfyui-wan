@@ -31,7 +31,9 @@
         "1x-ITF-SkinDiffDetail-Lite-v1.pth",
         "2xLiveActionV1_SPAN_490000.pth",
         "rife426.pth",
-        "taew2_1.pth"
+        "taew2_1.pth",
+        "lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+        "sam3.1_multiplex_fp16.safetensors"
       ]
     },
     "download_steady_dancer": {
@@ -52,7 +54,8 @@
         "2xLiveActionV1_SPAN_490000.pth",
         "rife426.pth",
         "taew2_1.pth",
-        "wan2.1_SCAIL_2_DPO_lora_bf16.safetensors"
+        "wan2.1_SCAIL_2_DPO_lora_bf16.safetensors",
+        "1x-ITF-SkinDiffDetail-Lite-v1.pth"
       ]
     }
   },
