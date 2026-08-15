@@ -3535,7 +3535,7 @@
         }
       },
       "widgets_values": [
-        "wan2.1_14B_SCAIL_2_fp8_scaled.safetensors",
+        "wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
         "default"
       ],
       "color": "#223",

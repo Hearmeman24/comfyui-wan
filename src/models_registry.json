@@ -80,9 +80,13 @@
     "subdir": "detection",
     "min_size_mb": 0.2
   },
-  "wan2.1_14B_SCAIL_2_fp8_scaled.safetensors": {
-    "url": "https://huggingface.co/Comfy-Org/SCAIL-2/resolve/main/diffusion_models/wan2.1_14B_SCAIL_2_fp8_scaled.safetensors",
+  "wan2.1_14B_SCAIL_2_int8_convrot.safetensors": {
+    "url": "https://huggingface.co/Comfy-Org/SCAIL-2/resolve/main/diffusion_models/wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
     "subdir": "diffusion_models"
+  },
+  "wan2.1_SCAIL_2_DPO_lora_bf16.safetensors": {
+    "url": "https://huggingface.co/Comfy-Org/SCAIL-2/resolve/main/loras/wan2.1_SCAIL_2_DPO_lora_bf16.safetensors",
+    "subdir": "loras"
   },
   "wan2.1_i2v_480p_14B_bf16.safetensors": {
     "url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_480p_14B_bf16.safetensors",
