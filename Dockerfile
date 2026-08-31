@@ -31,14 +31,14 @@ FROM ${BASE_IMAGE}
 # EVERY pack is baked here as of 2026-08-14. template.json's
 # custom_nodes.repos is now empty and the runtime's clone loop is a no-op for
 # wan, so a boot performs no network fetch for nodes at all. The three that
-# used to be boot-cloned under spec D4 (WanAnimatePreprocess, WanMoEScheduler,
-# Openrouter_node) are in the loop below; the maintainer's call, 2026-08-14: "these no
-# longer move". The tradeoff that buys: no upstream fix reaches a pod without
+# used to be boot-cloned (WanAnimatePreprocess, WanMoEScheduler,
+# Openrouter_node) are in the loop below and no longer move independently.
+# The tradeoff that buys: no upstream fix reaches a pod without
 # a rebuild and a new vN tag, and in exchange a boot cannot lose a node pack
 # to GitHub being unreachable.
 #
 # Nothing is pinned. KJNodes used to be held at 204f6d5 (2026-01-05) by the
-# runtime clone loop; The maintainer dropped that pin on 2026-08-14, so the image takes
+# runtime clone loop; the pin was removed on 2026-08-14, so the image takes
 # whatever kijai's main resolves to at build time.
 #
 # The ADD below is what makes "latest" true on more than the first build. CI
@@ -46,8 +46,8 @@ FROM ${BASE_IMAGE}
 # (.circleci/config.yml:10,136), so an unchanged RUN line serves its cached
 # layer forever and a rebuild would silently reship the KJNodes commit the
 # FIRST build happened to resolve. The ADD re-reads the GitHub API every
-# build, so the layer invalidates whenever kijai's main moves (CLAUDE.md
-# section 8). All 24 clones live in the one RUN below, so that invalidation
+# build, so the layer invalidates whenever kijai's main moves. All 24 clones
+# live in the one RUN below, so that invalidation
 # re-resolves every pack, not only KJNodes. That is the intended shape here:
 # with the boot-time clone loop gone, a rebuild is now the only way any pack
 # moves at all.
