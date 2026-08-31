@@ -17,7 +17,7 @@
 # (spec M-A), so the four CUDA override ARGs the old Dockerfile carried are
 # gone with them.
 # ============================================================================
-ARG BASE_IMAGE=hearmeman/comfyui-base:cu130-comfy0.32.0-torch2.11.0
+ARG BASE_IMAGE=hearmeman/comfyui-base:cu130-comfy0.34.0-torch2.11.0
 FROM ${BASE_IMAGE}
 
 # The wan node set, culled 2026-08-13 to the packs the shipped workflows
