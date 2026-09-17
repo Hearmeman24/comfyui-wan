@@ -1,0 +1,36 @@
+name: Notify website content update
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'workflows/**'
+      - 'catalog.json'
+      - 'catalog/assets/**'
+      - '.github/workflows/website-content.yml'
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: website-content-notification
+  cancel-in-progress: false
+jobs:
+  notify:
+    if: github.ref == 'refs/heads/master' && vars.WEBSITE_CMS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Obtain token restricted to the website repository
+        id: app
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349
+        with:
+          app-id: ${{ vars.WEBSITE_CMS_APP_ID }}
+          private-key: ${{ secrets.WEBSITE_CMS_APP_PRIVATE_KEY }}
+          owner: Hearmeman24
+          repositories: hearmemanai-website
+          permission-actions: write
+      - name: Request central import and publish
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          gh workflow run publish-content.yml --repo Hearmeman24/hearmemanai-website --ref main -f "source_repository=$SOURCE_REPOSITORY" -f "source_sha=$SOURCE_SHA"

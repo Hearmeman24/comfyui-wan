@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "workflows": [
+    {
+      "id": "wan-scail-2-motion-transfer",
+      "file": "workflows/SCAIL-2/SCAIL_2_HearmemanAI.json",
+      "title": "SCAIL 2 character animation",
+      "description": "Animate a character reference using motion from a driving video.",
+      "model": "Wan 2.1",
+      "output": "Video",
+      "tags": [
+        "Wan 2.1",
+        "SCAIL 2",
+        "motion-control",
+        "image-reference",
+        "video-reference",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2026-06-11T18:56:35Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running."
+      ]
+    },
+    {
+      "id": "wan-steady-dancer",
+      "file": "workflows/Steady Dancer/Steady_Dancer_Kijai.json",
+      "title": "SteadyDancer motion transfer",
+      "description": "Drive character animation with a reference image and extracted video poses.",
+      "model": "Wan 2.1",
+      "output": "Video",
+      "tags": [
+        "Wan 2.1",
+        "SteadyDancer",
+        "motion-control",
+        "image-reference",
+        "video-reference",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2025-12-05T11:33:00Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running.",
+        "Save wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_low_noise_model.safetensors.",
+        "ViTPose requires both the ONNX graph and vitpose_h_wholebody_data.bin in ComfyUI/models/detection.",
+        "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
+      ]
+    },
+    {
+      "id": "wan-2-1-image-to-video-60fps",
+      "file": "workflows/Wan 2.1/Native-I2V-60FPS.json",
+      "title": "Wan 2.1 image to video · 60 FPS",
+      "description": "Animate an image with Wan 2.1, then interpolate the output to 60 FPS.",
+      "model": "Wan 2.1",
+      "output": "Video",
+      "tags": [
+        "Wan 2.1",
+        "image-to-video",
+        "frame-interpolation",
+        "60-fps",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2025-06-04T11:53:38Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running.",
+        "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
+      ]
+    },
+    {
+      "id": "wan-2-1-text-to-video-60fps",
+      "file": "workflows/Wan 2.1/Native-T2V-60FPS.json",
+      "title": "Wan 2.1 text to video · 60 FPS",
+      "description": "Generate a video with Wan 2.1, then interpolate the output to 60 FPS.",
+      "model": "Wan 2.1",
+      "output": "Video",
+      "tags": [
+        "Wan 2.1",
+        "text-to-video",
+        "frame-interpolation",
+        "60-fps",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2025-06-04T11:53:38Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running.",
+        "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
+      ]
+    },
+    {
+      "id": "wan-2-2-text-to-image",
+      "file": "workflows/Wan 2.2/Image Generation/Wan2.2_Text-To-Image.json",
+      "title": "Wan 2.2 text to image",
+      "description": "Use Wan 2.2 high- and low-noise models to generate a still image.",
+      "model": "Wan 2.2",
+      "output": "Image",
+      "tags": [
+        "Wan 2.2",
+        "text-to-image",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2025-07-30T10:07:44Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running."
+      ]
+    },
+    {
+      "id": "wan-svi-four-pass-v3",
+      "file": "workflows/Wan 2.2/Video Generation/SVI 4-pass/Wan2.2_SVI_4pass_V3.json",
+      "title": "Wan 2.2 SVI four-pass V3",
+      "description": "Build an image-to-video sequence across four passes with separate LoRA controls.",
+      "model": "Wan 2.2",
+      "output": "Video",
+      "tags": [
+        "Wan 2.2",
+        "image-to-video",
+        "SVI",
+        "multi-pass",
+        "LoRA",
+        "upscale",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2026-08-11T11:38:09Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running.",
+        "Save wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_high_noise_model.safetensors.",
+        "Save wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_low_noise_model.safetensors.",
+        "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
+      ]
+    },
+    {
+      "id": "wan-2-2-image-to-video",
+      "file": "workflows/Wan 2.2/Video Generation/Wan2.2_I2V.json",
+      "title": "Wan 2.2 image to video",
+      "description": "Animate a starting image with Wan 2.2 and frame interpolation.",
+      "model": "Wan 2.2",
+      "output": "Video",
+      "tags": [
+        "Wan 2.2",
+        "image-to-video",
+        "frame-interpolation",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2025-08-04T10:44:39Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running.",
+        "Save wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_high_noise_model.safetensors.",
+        "Save wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_low_noise_model.safetensors."
+      ]
+    },
+    {
+      "id": "wan-2-2-text-to-video",
+      "file": "workflows/Wan 2.2/Video Generation/Wan2.2_T2V.json",
+      "title": "Wan 2.2 text to video",
+      "description": "Generate video from a written prompt with Wan 2.2 and frame interpolation.",
+      "model": "Wan 2.2",
+      "output": "Video",
+      "tags": [
+        "Wan 2.2",
+        "text-to-video",
+        "frame-interpolation",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2025-08-04T10:44:39Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running."
+      ]
+    },
+    {
+      "id": "wan-animate-character-animation",
+      "file": "workflows/Wan Animate/Wan_Animate_V2_HearmemanAI.json",
+      "title": "Wan Animate",
+      "description": "Transfer movement from a driving video to a reference character.",
+      "model": "Wan 2.2",
+      "output": "Video",
+      "tags": [
+        "Wan 2.2",
+        "Wan Animate",
+        "motion-control",
+        "image-reference",
+        "video-reference",
+        "ComfyUI"
+      ],
+      "status": "published",
+      "publishedAt": "2025-09-27T14:26:58Z",
+      "notes": [
+        "Replace prompt placeholders and supply your own input images, video or audio before running.",
+        "Save wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_low_noise_model.safetensors.",
+        "ViTPose requires both the ONNX graph and vitpose_h_wholebody_data.bin in ComfyUI/models/detection.",
+        "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache.",
+        "DWPose downloads its selected detector and pose model on first use; custom cache settings may change the listed paths."
+      ]
+    }
+  ]
+}
