@@ -167,6 +167,36 @@ jobs:
               -H "Content-Type: application/json" \
               -d "{\"message\": \"${MSG}\", \"source\": \"circleci\"}"
 
+  update_runpod_templates:
+    executor: python
+    steps:
+      - checkout
+      - run:
+          name: Promote image to RunPod templates
+          command: |
+            python3 tools/update_runpod_template.py \
+              --image "hearmeman/comfyui-wan-template:${CIRCLE_TAG}" \
+              --expected-repository "hearmeman/comfyui-wan-template" \
+              --template-ids "758dsjwiqz,cj0puq01ye,zidjiok0au"
+            touch /tmp/runpod_promotion_success
+      - run:
+          name: Notify FlowBot - RunPod promotion
+          when: always
+          command: |
+            if [ -z "$FLOWBOT_WEBHOOK_URL" ] || [ -z "$FLOWBOT_WEBHOOK_TOKEN" ]; then
+              echo "Missing webhook env vars, skipping notification."
+              exit 0
+            fi
+            if [ -f /tmp/runpod_promotion_success ]; then
+              MSG="RunPod templates now use comfyui-wan-template:${CIRCLE_TAG}."
+            else
+              MSG="RunPod template promotion failed for comfyui-wan-template:${CIRCLE_TAG}; inspect CircleCI."
+            fi
+            curl -s -X POST "${FLOWBOT_WEBHOOK_URL}/hooks/agent" \
+              -H "Authorization: Bearer ${FLOWBOT_WEBHOOK_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"message\": \"${MSG}\", \"source\": \"circleci\"}"
+
 workflows:
   version: 2
   build_on_tag:
@@ -198,6 +228,18 @@ workflows:
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*$/  # run on tags like v5 or v1.2.3
+            branches:
+              ignore: /.*/
+      - update_runpod_templates:
+          requires:
+            - build_and_push
+          context:
+            - runpod-template-deploy
+            - flowbot-webhook-token
+          serial-group: runpod/comfyui-wan-template
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*$/
             branches:
               ignore: /.*/
 
