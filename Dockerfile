@@ -6,7 +6,7 @@
 # The base owns: python 3.12 + /opt/venv (on PATH), the pinned torch trio +
 # /torch-constraint.txt applied via ENV PIP_CONSTRAINT, pip tooling, pyyaml/
 # gdown/triton/jupyterlab, huggingface_hub + hf_xet, opencv-python, ComfyUI
-# pinned at COMFYUI_REF (v0.32.0) with /comfyui-approved-ref, ComfyUI-Manager,
+# pinned at the approved ComfyUI 0.36.0 post-release SHA with /comfyui-approved-ref, ComfyUI-Manager,
 # both SageAttention wheels under /opt/sage/, the CivitAI downloader, and
 # ENV ORT_INDEX_ARGS (the per-CUDA-variant onnxruntime index nuance).
 #
@@ -17,7 +17,7 @@
 # (spec M-A), so the four CUDA override ARGs the old Dockerfile carried are
 # gone with them.
 # ============================================================================
-ARG BASE_IMAGE=hearmeman/comfyui-base:cu130-comfy0.34.0-torch2.11.0
+ARG BASE_IMAGE=hearmeman/comfyui-base:cu130-comfy0.36.0-3dd559d8-torch2.11.0
 FROM ${BASE_IMAGE}
 
 # The wan node set, culled 2026-08-13 to the packs the shipped workflows
