@@ -20,6 +20,14 @@
       "publishedAt": "2026-06-11T18:56:35Z",
       "notes": [
         "Replace prompt placeholders and supply your own input images, video or audio before running."
+      ],
+      "difficulty": "Advanced",
+      "inputs": [
+        "Image",
+        "Video"
+      ],
+      "outputs": [
+        "Video"
       ]
     },
     {
@@ -44,12 +52,20 @@
         "Save wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_low_noise_model.safetensors.",
         "ViTPose requires both the ONNX graph and vitpose_h_wholebody_data.bin in ComfyUI/models/detection.",
         "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
+      ],
+      "difficulty": "Advanced",
+      "inputs": [
+        "Image",
+        "Video"
+      ],
+      "outputs": [
+        "Video"
       ]
     },
     {
       "id": "wan-2-1-image-to-video-60fps",
       "file": "workflows/Wan 2.1/Native-I2V-60FPS.json",
-      "title": "Wan 2.1 image to video · 60 FPS",
+      "title": "Wan 2.1 image to video \u00b7 60 FPS",
       "description": "Animate an image with Wan 2.1, then interpolate the output to 60 FPS.",
       "model": "Wan 2.1",
       "output": "Video",
@@ -65,12 +81,20 @@
       "notes": [
         "Replace prompt placeholders and supply your own input images, video or audio before running.",
         "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
+      ],
+      "difficulty": "Advanced",
+      "inputs": [
+        "Image",
+        "Text"
+      ],
+      "outputs": [
+        "Video"
       ]
     },
     {
       "id": "wan-2-1-text-to-video-60fps",
       "file": "workflows/Wan 2.1/Native-T2V-60FPS.json",
-      "title": "Wan 2.1 text to video · 60 FPS",
+      "title": "Wan 2.1 text to video \u00b7 60 FPS",
       "description": "Generate a video with Wan 2.1, then interpolate the output to 60 FPS.",
       "model": "Wan 2.1",
       "output": "Video",
@@ -86,6 +110,13 @@
       "notes": [
         "Replace prompt placeholders and supply your own input images, video or audio before running.",
         "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
+      ],
+      "difficulty": "Advanced",
+      "inputs": [
+        "Text"
+      ],
+      "outputs": [
+        "Video"
       ]
     },
     {
@@ -104,6 +135,13 @@
       "publishedAt": "2025-07-30T10:07:44Z",
       "notes": [
         "Replace prompt placeholders and supply your own input images, video or audio before running."
+      ],
+      "difficulty": "Beginner",
+      "inputs": [
+        "Text"
+      ],
+      "outputs": [
+        "Image"
       ]
     },
     {
@@ -129,6 +167,14 @@
         "Save wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_high_noise_model.safetensors.",
         "Save wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_low_noise_model.safetensors.",
         "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
+      ],
+      "difficulty": "Advanced",
+      "inputs": [
+        "Image",
+        "Text"
+      ],
+      "outputs": [
+        "Video"
       ]
     },
     {
@@ -150,6 +196,14 @@
         "Replace prompt placeholders and supply your own input images, video or audio before running.",
         "Save wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_high_noise_model.safetensors.",
         "Save wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_low_noise_model.safetensors."
+      ],
+      "difficulty": "Advanced",
+      "inputs": [
+        "Image",
+        "Text"
+      ],
+      "outputs": [
+        "Video"
       ]
     },
     {
@@ -169,6 +223,13 @@
       "publishedAt": "2025-08-04T10:44:39Z",
       "notes": [
         "Replace prompt placeholders and supply your own input images, video or audio before running."
+      ],
+      "difficulty": "Beginner",
+      "inputs": [
+        "Text"
+      ],
+      "outputs": [
+        "Video"
       ]
     },
     {
@@ -194,6 +255,14 @@
         "ViTPose requires both the ONNX graph and vitpose_h_wholebody_data.bin in ComfyUI/models/detection.",
         "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache.",
         "DWPose downloads its selected detector and pose model on first use; custom cache settings may change the listed paths."
+      ],
+      "difficulty": "Advanced",
+      "inputs": [
+        "Image",
+        "Video"
+      ],
+      "outputs": [
+        "Video"
       ]
     }
   ]
