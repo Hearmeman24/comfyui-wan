@@ -36,16 +36,6 @@
         "sam3.1_multiplex_fp16.safetensors"
       ]
     },
-    "download_steady_dancer": {
-      "folders": [
-        "Steady Dancer"
-      ],
-      "extra_models": [
-        "2xLiveActionV1_SPAN_490000.pth",
-        "rife426.pth",
-        "taew2_1.pth"
-      ]
-    },
     "DOWNLOAD_SCAIL2": {
       "folders": [
         "SCAIL-2"

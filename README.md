@@ -31,7 +31,6 @@ FYI: this template is built for CUDA 13.0 and above.
 | `download_wan21` | false | Wan 2.1 text to video and image to video, with their workflows and models |
 | `download_wan22` | false | Wan 2.2 text to video, image to video, still images and SVI video extension |
 | `download_wan_animate` | false | Wan Animate: motion and expression transfer onto a character |
-| `download_steady_dancer` | false | Steady Dancer workflow and models |
 | `DOWNLOAD_SCAIL2` | false | SCAIL-2 workflow and models. Note the uppercase. |
 | `civitai_token` | empty | Your CivitAI API token |
 | `CIVITAI_LORAS` | empty | Comma-separated CivitAI version IDs. They go to `models/loras`. |

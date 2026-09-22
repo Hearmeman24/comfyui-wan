@@ -5,7 +5,7 @@
       "id": "wan-scail-2-motion-transfer",
       "file": "workflows/SCAIL-2/SCAIL_2_HearmemanAI.json",
       "title": "SCAIL 2 character animation",
-      "description": "Animate a character reference using motion from a driving video.",
+      "description": "SCAIL 2 motion transfer in ComfyUI: animate your AI character with the moves from any video. Free workflow for AI influencer and cartoon videos.",
       "model": "Wan 2.1",
       "output": "Video",
       "tags": [
@@ -28,45 +28,45 @@
       ],
       "outputs": [
         "Video"
-      ]
-    },
-    {
-      "id": "wan-steady-dancer",
-      "file": "workflows/Steady Dancer/Steady_Dancer_Kijai.json",
-      "title": "SteadyDancer motion transfer",
-      "description": "Drive character animation with a reference image and extracted video poses.",
-      "model": "Wan 2.1",
-      "output": "Video",
-      "tags": [
-        "Wan 2.1",
-        "SteadyDancer",
-        "motion-control",
-        "image-reference",
-        "video-reference",
-        "ComfyUI"
       ],
-      "status": "published",
-      "publishedAt": "2025-12-05T11:33:00Z",
-      "notes": [
-        "Replace prompt placeholders and supply your own input images, video or audio before running.",
-        "Save wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors as ComfyUI/models/loras/i2v_lightx2v_low_noise_model.safetensors.",
-        "ViTPose requires both the ONNX graph and vitpose_h_wholebody_data.bin in ComfyUI/models/detection.",
-        "RIFE downloads its checkpoint on first use; the listed path is the frame-interpolation node's default cache."
-      ],
-      "difficulty": "Advanced",
-      "inputs": [
-        "Image",
-        "Video"
-      ],
-      "outputs": [
-        "Video"
+      "body": "Motion transfer puts **your character** into any video. Add a character image and a driving video (a dance, a walk, a talking clip) and the workflow repaints the video with your character copying the motion. This version uses SCAIL 2 (Wan 2.1), which tracks the person you pick in the video by name, like \"person on the left\".\n\n**Great for:**\n- AI influencer dance and motion videos\n- Animating cartoon and anime characters with real movement\n- Picking one person out of a multi-person clip\n\n### How it works\n1. Load your character image and the driving video.\n2. Say who to track and write a detailed prompt.\n3. Run it to get the video and an extended continuation.\n\n### Want better results with less work?\n[Wan Animate / SCAIL 2 God Mode](/premium-workflows/wan-animate-god-mode/) is the plug-and-play version of this workflow. It includes both Wan Animate and SCAIL 2 in one pack and adds:\n- **Automatic prompting:** an AI prompt writer fills in the prompt for you\n- **Sharper, smoother video:** detail passes, upscaling and frame interpolation\n- **More control:** replace the person, keep the original background, or replace a custom region\n- **Ready to run:** a matching RunPod template, a step-by-step guide and a private Discord support channel\n\n### Make it yours with LoRAs\nThis workflow supports LoRAs. Grab character, style, anime or cartoon LoRAs from [CivitAI](https://civitai.com) or [Hugging Face](https://huggingface.co), drop them into the LoRA loader, and keep your AI character looking the same in every shot.",
+      "settings": [
+        {
+          "label": "GPU",
+          "value": [
+            "H100",
+            "H200",
+            "RTX PRO 6000",
+            "RTX 5090"
+          ]
+        },
+        {
+          "label": "Sampler",
+          "value": "er_sde"
+        },
+        {
+          "label": "Scheduler",
+          "value": "beta"
+        },
+        {
+          "label": "Turbo LoRA",
+          "value": "LightX2V distill LoRA"
+        },
+        {
+          "label": "Steps",
+          "value": "6 for the first pass, 4 for the extension"
+        },
+        {
+          "label": "CFG",
+          "value": "1"
+        }
       ]
     },
     {
       "id": "wan-2-1-image-to-video-60fps",
       "file": "workflows/Wan 2.1/Native-I2V-60FPS.json",
-      "title": "Wan 2.1 image to video \u00b7 60 FPS",
-      "description": "Animate an image with Wan 2.1, then interpolate the output to 60 FPS.",
+      "title": "Wan 2.1 image to video · 60 FPS",
+      "description": "Animate an image with Wan 2.1 image-to-video and get smooth 60 fps AI video. Free ComfyUI workflow for AI influencers and cartoons.",
       "model": "Wan 2.1",
       "output": "Video",
       "tags": [
@@ -89,13 +89,51 @@
       ],
       "outputs": [
         "Video"
+      ],
+      "body": "Wan 2.1 is a proven open-source AI video model with a huge library of community LoRAs. Start from your image, animate it and get a smooth 60 fps clip.\n\n**Great for:**\n- Animating AI influencer photos\n- Cartoon and anime character animation\n- Using your favorite Wan 2.1 LoRAs\n\n### How it works\n1. Load your image.\n2. Describe the motion.\n3. Run it and get the original clip and a smooth 60 fps version.\n\n### Make it yours with LoRAs\nThis workflow supports LoRAs. Grab character, style, anime or cartoon LoRAs from [CivitAI](https://civitai.com) or [Hugging Face](https://huggingface.co), drop them into the LoRA loader, and keep your AI character looking the same in every shot.",
+      "settings": [
+        {
+          "label": "GPU",
+          "value": [
+            "H100",
+            "H200",
+            "RTX PRO 6000",
+            "RTX 5090"
+          ]
+        },
+        {
+          "label": "Sampler",
+          "value": [
+            "euler",
+            "res_2s (better quality, slower)"
+          ]
+        },
+        {
+          "label": "Scheduler",
+          "value": [
+            "simple",
+            "beta"
+          ]
+        },
+        {
+          "label": "Turbo LoRA",
+          "value": "LightX2V turbo LoRA"
+        },
+        {
+          "label": "Steps",
+          "value": "3"
+        },
+        {
+          "label": "CFG",
+          "value": "1"
+        }
       ]
     },
     {
       "id": "wan-2-1-text-to-video-60fps",
       "file": "workflows/Wan 2.1/Native-T2V-60FPS.json",
-      "title": "Wan 2.1 text to video \u00b7 60 FPS",
-      "description": "Generate a video with Wan 2.1, then interpolate the output to 60 FPS.",
+      "title": "Wan 2.1 text to video · 60 FPS",
+      "description": "Free Wan 2.1 text-to-video ComfyUI workflow with smooth 60 fps interpolation. Create AI character and cartoon videos from a prompt.",
       "model": "Wan 2.1",
       "output": "Video",
       "tags": [
@@ -117,13 +155,51 @@
       ],
       "outputs": [
         "Video"
+      ],
+      "body": "Wan 2.1 is a proven open-source AI video model with a huge library of community LoRAs. Type a prompt, generate a clip and get a smooth 60 fps version.\n\n**Great for:**\n- AI character and influencer clips\n- Cartoon and anime scenes using Wan 2.1 LoRAs\n- Smooth, social-ready video\n\n### How it works\n1. Write your prompt.\n2. Run it.\n3. Get the original clip and a smooth 60 fps version.\n\n### Make it yours with LoRAs\nThis workflow supports LoRAs. Grab character, style, anime or cartoon LoRAs from [CivitAI](https://civitai.com) or [Hugging Face](https://huggingface.co), drop them into the LoRA loader, and keep your AI character looking the same in every shot.",
+      "settings": [
+        {
+          "label": "GPU",
+          "value": [
+            "H100",
+            "H200",
+            "RTX PRO 6000",
+            "RTX 5090"
+          ]
+        },
+        {
+          "label": "Sampler",
+          "value": [
+            "euler",
+            "res_2s (better quality, slower)"
+          ]
+        },
+        {
+          "label": "Scheduler",
+          "value": [
+            "simple",
+            "beta"
+          ]
+        },
+        {
+          "label": "Turbo LoRA",
+          "value": "LightX2V turbo LoRA"
+        },
+        {
+          "label": "Steps",
+          "value": "3"
+        },
+        {
+          "label": "CFG",
+          "value": "1"
+        }
       ]
     },
     {
       "id": "wan-2-2-text-to-image",
       "file": "workflows/Wan 2.2/Image Generation/Wan2.2_Text-To-Image.json",
       "title": "Wan 2.2 text to image",
-      "description": "Use Wan 2.2 high- and low-noise models to generate a still image.",
+      "description": "Use the Wan 2.2 video model to make photorealistic AI images from text. A free ComfyUI workflow for AI influencer and character photos.",
       "model": "Wan 2.2",
       "output": "Image",
       "tags": [
@@ -142,13 +218,51 @@
       ],
       "outputs": [
         "Image"
+      ],
+      "body": "Wan 2.2 is one of the most popular open-source AI video models, known for realistic motion and strong prompt following. It also makes excellent still images: this workflow renders a single high-resolution frame, which often looks more natural than image-only models.\n\n**Great for:**\n- Realistic AI influencer photos\n- Character portraits and concept art\n- Start frames for your Wan videos\n\n### How it works\n1. Write your prompt.\n2. Run it through the high noise and low noise stages.\n3. Save your 1536x1536 image.\n\n### Tip for higher quality\nRemove the turbo LoRA from the high noise sampler, raise CFG to 2.2-3 and add a few more steps. Generation gets slower, but motion and detail improve.\n\n### Make it yours with LoRAs\nThis workflow supports LoRAs. Grab character, style, anime or cartoon LoRAs from [CivitAI](https://civitai.com) or [Hugging Face](https://huggingface.co), drop them into the LoRA loader, and keep your AI character looking the same in every shot.",
+      "settings": [
+        {
+          "label": "GPU",
+          "value": [
+            "H100",
+            "H200",
+            "RTX PRO 6000",
+            "RTX 5090"
+          ]
+        },
+        {
+          "label": "Sampler",
+          "value": [
+            "euler",
+            "res_2s (better quality, slower)"
+          ]
+        },
+        {
+          "label": "Scheduler",
+          "value": [
+            "simple",
+            "beta"
+          ]
+        },
+        {
+          "label": "Turbo LoRA",
+          "value": "LightX2V turbo LoRA"
+        },
+        {
+          "label": "Steps",
+          "value": "3 per sampler (high noise and low noise)"
+        },
+        {
+          "label": "CFG",
+          "value": "1"
+        }
       ]
     },
     {
       "id": "wan-svi-four-pass-v3",
       "file": "workflows/Wan 2.2/Video Generation/SVI 4-pass/Wan2.2_SVI_4pass_V3.json",
       "title": "Wan 2.2 SVI four-pass V3",
-      "description": "Build an image-to-video sequence across four passes with separate LoRA controls.",
+      "description": "Make AI videos up to 20 seconds long with Wan 2.2 SVI. Chain four scenes, each with its own prompt and LoRAs, into one smooth clip.",
       "model": "Wan 2.2",
       "output": "Video",
       "tags": [
@@ -175,13 +289,51 @@
       ],
       "outputs": [
         "Video"
+      ],
+      "body": "Most AI video models stop at about 5 seconds. This Wan 2.2 video extension workflow (SVI) chains **four 5-second segments** into one continuous video of up to 20 seconds.\n\n**Great for:**\n- Chaining several actions into one story\n- Longer AI influencer and character videos\n- Cartoon scenes that continue naturally\n\n### How it works\n1. Load your start image.\n2. Write a prompt for each of the four segments. Each segment can also use its own LoRAs.\n3. Run it. The segments are blended together, upscaled and interpolated to 60 fps.\n\n### Tip for higher quality\nRemove the turbo LoRA from the high noise sampler, raise CFG to 2.2-3 and add a few more steps. Generation gets slower, but motion and detail improve.\n\n### Make it yours with LoRAs\nThis workflow supports LoRAs. Grab character, style, anime or cartoon LoRAs from [CivitAI](https://civitai.com) or [Hugging Face](https://huggingface.co), drop them into the LoRA loader, and keep your AI character looking the same in every shot.",
+      "settings": [
+        {
+          "label": "GPU",
+          "value": [
+            "H100",
+            "H200",
+            "RTX PRO 6000",
+            "RTX 5090"
+          ]
+        },
+        {
+          "label": "Sampler",
+          "value": [
+            "euler",
+            "res_2s (better quality, slower)"
+          ]
+        },
+        {
+          "label": "Scheduler",
+          "value": [
+            "simple",
+            "beta"
+          ]
+        },
+        {
+          "label": "Turbo LoRA",
+          "value": "LightX2V turbo LoRA"
+        },
+        {
+          "label": "Steps",
+          "value": "3 per sampler (high noise and low noise)"
+        },
+        {
+          "label": "CFG",
+          "value": "1"
+        }
       ]
     },
     {
       "id": "wan-2-2-image-to-video",
       "file": "workflows/Wan 2.2/Video Generation/Wan2.2_I2V.json",
       "title": "Wan 2.2 image to video",
-      "description": "Animate a starting image with Wan 2.2 and frame interpolation.",
+      "description": "Animate any image with Wan 2.2 image-to-video in ComfyUI, with 60 fps frame interpolation. Bring AI influencers and cartoon characters to life.",
       "model": "Wan 2.2",
       "output": "Video",
       "tags": [
@@ -204,13 +356,51 @@
       ],
       "outputs": [
         "Video"
+      ],
+      "body": "Wan 2.2 is one of the most popular open-source AI video models, known for realistic motion and strong prompt following. Start from your own image, so your AI character keeps its exact look, and get a smooth 60 fps clip.\n\n**Great for:**\n- Animating AI influencer photos\n- Cartoon and anime character animation\n- Turning AI art into short videos\n\n### How it works\n1. Load your image.\n2. Describe the motion you want.\n3. Run it and get a 16 fps video and a smooth 60 fps version.\n\n### Tip for higher quality\nRemove the turbo LoRA from the high noise sampler, raise CFG to 2.2-3 and add a few more steps. Generation gets slower, but motion and detail improve.\n\n### Make it yours with LoRAs\nThis workflow supports LoRAs. Grab character, style, anime or cartoon LoRAs from [CivitAI](https://civitai.com) or [Hugging Face](https://huggingface.co), drop them into the LoRA loader, and keep your AI character looking the same in every shot.",
+      "settings": [
+        {
+          "label": "GPU",
+          "value": [
+            "H100",
+            "H200",
+            "RTX PRO 6000",
+            "RTX 5090"
+          ]
+        },
+        {
+          "label": "Sampler",
+          "value": [
+            "euler",
+            "res_2s (better quality, slower)"
+          ]
+        },
+        {
+          "label": "Scheduler",
+          "value": [
+            "simple",
+            "beta"
+          ]
+        },
+        {
+          "label": "Turbo LoRA",
+          "value": "LightX2V turbo LoRA"
+        },
+        {
+          "label": "Steps",
+          "value": "3 per sampler (high noise and low noise)"
+        },
+        {
+          "label": "CFG",
+          "value": "1"
+        }
       ]
     },
     {
       "id": "wan-2-2-text-to-video",
       "file": "workflows/Wan 2.2/Video Generation/Wan2.2_T2V.json",
       "title": "Wan 2.2 text to video",
-      "description": "Generate video from a written prompt with Wan 2.2 and frame interpolation.",
+      "description": "Free Wan 2.2 text-to-video ComfyUI workflow with smooth 60 fps output. Make AI influencer, AI character and cartoon videos from a prompt.",
       "model": "Wan 2.2",
       "output": "Video",
       "tags": [
@@ -230,13 +420,51 @@
       ],
       "outputs": [
         "Video"
+      ],
+      "body": "Wan 2.2 is one of the most popular open-source AI video models, known for realistic motion and strong prompt following. Type a prompt and this workflow generates the clip, then uses frame interpolation to make it a smooth 60 fps video.\n\n**Great for:**\n- AI influencer and lifestyle clips\n- Cartoon and anime scenes with LoRAs\n- Short social media videos\n\n### How it works\n1. Write your prompt.\n2. Run it. The turbo LoRA keeps generation fast.\n3. Get both the original 16 fps video and a smooth 60 fps version.\n\n### Tip for higher quality\nRemove the turbo LoRA from the high noise sampler, raise CFG to 2.2-3 and add a few more steps. Generation gets slower, but motion and detail improve.\n\n### Make it yours with LoRAs\nThis workflow supports LoRAs. Grab character, style, anime or cartoon LoRAs from [CivitAI](https://civitai.com) or [Hugging Face](https://huggingface.co), drop them into the LoRA loader, and keep your AI character looking the same in every shot.",
+      "settings": [
+        {
+          "label": "GPU",
+          "value": [
+            "H100",
+            "H200",
+            "RTX PRO 6000",
+            "RTX 5090"
+          ]
+        },
+        {
+          "label": "Sampler",
+          "value": [
+            "euler",
+            "res_2s (better quality, slower)"
+          ]
+        },
+        {
+          "label": "Scheduler",
+          "value": [
+            "simple",
+            "beta"
+          ]
+        },
+        {
+          "label": "Turbo LoRA",
+          "value": "LightX2V turbo LoRA"
+        },
+        {
+          "label": "Steps",
+          "value": "3 per sampler (high noise and low noise)"
+        },
+        {
+          "label": "CFG",
+          "value": "1"
+        }
       ]
     },
     {
       "id": "wan-animate-character-animation",
       "file": "workflows/Wan Animate/Wan_Animate_V2_HearmemanAI.json",
       "title": "Wan Animate",
-      "description": "Transfer movement from a driving video to a reference character.",
+      "description": "Free Wan Animate motion transfer workflow: put your AI character or AI influencer into any video. Character image plus driving video equals AI video.",
       "model": "Wan 2.2",
       "output": "Video",
       "tags": [
@@ -263,6 +491,42 @@
       ],
       "outputs": [
         "Video"
+      ],
+      "body": "Motion transfer puts **your character** into any video. Add a character image and a driving video (a dance, a walk, a talking clip) and the workflow repaints the video with your character copying the motion. This version uses Wan Animate (Wan 2.2) to replace the person in the video with your character.\n\n**Great for:**\n- AI influencers doing trending dances\n- Turning a cartoon character into a real performer\n- Character swaps in existing clips\n\n### How it works\n1. Load your character image.\n2. Load the driving video.\n3. Run it. Your character takes over the motion, with a smooth frame-interpolated version included.\n\n### Want better results with less work?\n[Wan Animate / SCAIL 2 God Mode](/premium-workflows/wan-animate-god-mode/) is the plug-and-play version of this workflow. It includes both Wan Animate and SCAIL 2 in one pack and adds:\n- **Automatic prompting:** an AI prompt writer fills in the prompt for you\n- **Sharper, smoother video:** detail passes, upscaling and frame interpolation\n- **More control:** replace the person, keep the original background, or replace a custom region\n- **Ready to run:** a matching RunPod template, a step-by-step guide and a private Discord support channel\n\n### Make it yours with LoRAs\nThis workflow supports LoRAs. Grab character, style, anime or cartoon LoRAs from [CivitAI](https://civitai.com) or [Hugging Face](https://huggingface.co), drop them into the LoRA loader, and keep your AI character looking the same in every shot.",
+      "settings": [
+        {
+          "label": "GPU",
+          "value": [
+            "H100",
+            "H200",
+            "RTX PRO 6000",
+            "RTX 5090"
+          ]
+        },
+        {
+          "label": "Sampler",
+          "value": "euler"
+        },
+        {
+          "label": "Scheduler",
+          "value": "simple"
+        },
+        {
+          "label": "Turbo LoRA",
+          "value": "LightX2V turbo LoRA"
+        },
+        {
+          "label": "Steps",
+          "value": "4"
+        },
+        {
+          "label": "CFG",
+          "value": "1"
+        },
+        {
+          "label": "Shift",
+          "value": "8"
+        }
       ]
     }
   ]
