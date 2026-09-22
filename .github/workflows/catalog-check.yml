@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: Hearmeman24/comfyui-qwen-template
-          ref: 066a32758d4f883bc068656c27fd3a486649eacd
+          ref: 7a4543f2639b8fe20126b1bb58b61010dfb19d3c
           path: .catalog-validator
           sparse-checkout: tools
           persist-credentials: false
