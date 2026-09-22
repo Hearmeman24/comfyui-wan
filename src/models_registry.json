@@ -34,10 +34,6 @@
     "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan21_CausVid_14B_T2V_lora_rank32.safetensors",
     "subdir": "loras"
   },
-  "Wan21_I2V_SteadyDancer_fp16.safetensors": {
-    "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/SteadyDancer/Wan21_I2V_SteadyDancer_fp16.safetensors",
-    "subdir": "diffusion_models"
-  },
   "Wan2_1_VAE_bf16.safetensors": {
     "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1_VAE_bf16.safetensors",
     "subdir": "vae"
