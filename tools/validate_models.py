@@ -14,6 +14,7 @@ Stdlib only.
 """
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -22,6 +23,7 @@ REPO = Path(__file__).resolve().parents[1]
 RUNTIME_URL = "https://github.com/Hearmeman24/comfyui-runtime.git"
 # Reuse one cached clone across runs.
 CACHE = Path.home() / ".cache" / "comfyui-runtime-validator"
+FULL_SHA = re.compile(r"[0-9a-fA-F]{40}")
 
 
 def _git(*args: str) -> None:
@@ -29,19 +31,30 @@ def _git(*args: str) -> None:
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+def _has_commit(sha: str) -> bool:
+    return subprocess.run(
+        ["git", "-C", str(CACHE), "cat-file", "-e", f"{sha}^{{commit}}"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
+
+
 def resolve_runtime(ref: str) -> Path:
     if not (CACHE / ".git").is_dir():
         CACHE.parent.mkdir(parents=True, exist_ok=True)
         subprocess.run(["git", "clone", "--quiet", RUNTIME_URL, str(CACHE)],
                        check=True)
-    # Fetch only when the pinned ref is not already local, so repeat runs
-    # stay offline once the ref has been seen.
-    try:
-        _git("rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}")
-    except subprocess.CalledProcessError:
+    # Only a full commit sha is immutable, so only a full sha that is already
+    # in the cache may skip the network. Any other ref (the pinned `stable` is
+    # a BRANCH) is fetched on every run: a copy of it in the cache is just
+    # whatever origin held when it was last seen. On 2026-11-26 the cache's
+    # local `stable` sat at 0ea1f91 while origin's was 1e97ec1, and provisioner
+    # tests failed locally while CI (fresh clone) was green. A failed fetch is
+    # FATAL, never a silent fall back to the cached copy.
+    if FULL_SHA.fullmatch(ref) and _has_commit(ref):
+        target = ref
+    else:
         _git("fetch", "--quiet", "origin", ref)
-        ref = "FETCH_HEAD"
-    _git("checkout", "--quiet", "--force", ref)
+        target = "FETCH_HEAD"
+    _git("checkout", "--quiet", "--force", "--detach", target)
     return CACHE
 
 
