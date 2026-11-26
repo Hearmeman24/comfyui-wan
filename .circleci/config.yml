@@ -66,6 +66,9 @@ jobs:
           command: |
             find . -path ./.git -prune -o -name '*.json' -print0 | xargs -0 -r -n1 python3 -m json.tool > /dev/null
       - run:
+          name: validate_models shim self-check (branch pins always re-fetched)
+          command: python3 tools/test_validate_models_shim.py
+      - run:
           name: onnxruntime CUDA-provider gate in Dockerfile
           command: |
             # The runtime repo's equivalent gate only scans its own tree, so
